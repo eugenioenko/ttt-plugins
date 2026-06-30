@@ -1,6 +1,14 @@
+local ttt = require("ttt")
 local settings = require("ttt.settings")
 
-settings.set("formatters.c", "clang-format")
-settings.set("formatters.cpp", "clang-format")
-settings.set("formatters.h", "clang-format")
-settings.set("formatters.hpp", "clang-format")
+local extensions = {"c", "cpp", "h", "hpp"}
+
+for _, ext in ipairs(extensions) do
+  settings.set("formatters." .. ext, "clang-format")
+end
+
+ttt.on_uninstall(function()
+  for _, ext in ipairs(extensions) do
+    settings.set("formatters." .. ext, nil)
+  end
+end)
