@@ -1,0 +1,11 @@
+{
+  "name": "lsp-docker",
+  "description": "Auto-configure docker-langserver as the Dockerfile language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

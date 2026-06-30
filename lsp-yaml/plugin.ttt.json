@@ -1,0 +1,11 @@
+{
+  "name": "lsp-yaml",
+  "description": "Auto-configure yaml-language-server as the YAML language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

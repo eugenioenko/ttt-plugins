@@ -1,0 +1,11 @@
+{
+  "name": "lsp-python",
+  "description": "Auto-configure pyright as the Python language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

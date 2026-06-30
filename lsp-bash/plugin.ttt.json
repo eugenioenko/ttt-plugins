@@ -1,0 +1,11 @@
+{
+  "name": "lsp-bash",
+  "description": "Auto-configure bash-language-server as the Shell language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

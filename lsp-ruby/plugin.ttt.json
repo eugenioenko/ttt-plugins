@@ -1,0 +1,11 @@
+{
+  "name": "lsp-ruby",
+  "description": "Auto-configure ruby-lsp as the Ruby language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

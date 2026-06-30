@@ -1,0 +1,11 @@
+{
+  "name": "lsp-zig",
+  "description": "Auto-configure zls as the Zig language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "lsp-dart",
+  "description": "Auto-configure dart language-server as the Dart language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

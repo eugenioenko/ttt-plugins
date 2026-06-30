@@ -1,0 +1,11 @@
+{
+  "name": "lsp-vue",
+  "description": "Auto-configure vue-language-server as the Vue language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

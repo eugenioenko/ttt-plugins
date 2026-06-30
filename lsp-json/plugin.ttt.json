@@ -1,0 +1,11 @@
+{
+  "name": "lsp-json",
+  "description": "Auto-configure vscode-json-language-server as the JSON language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

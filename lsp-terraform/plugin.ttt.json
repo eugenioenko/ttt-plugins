@@ -1,0 +1,11 @@
+{
+  "name": "lsp-terraform",
+  "description": "Auto-configure terraform-ls as the Terraform language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

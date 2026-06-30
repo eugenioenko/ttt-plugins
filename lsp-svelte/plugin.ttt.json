@@ -1,0 +1,11 @@
+{
+  "name": "lsp-svelte",
+  "description": "Auto-configure svelteserver as the Svelte language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

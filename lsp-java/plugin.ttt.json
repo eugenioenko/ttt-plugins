@@ -1,0 +1,11 @@
+{
+  "name": "lsp-java",
+  "description": "Auto-configure jdtls as the Java language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

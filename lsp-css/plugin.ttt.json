@@ -1,0 +1,11 @@
+{
+  "name": "lsp-css",
+  "description": "Auto-configure vscode-css-language-server as the CSS language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

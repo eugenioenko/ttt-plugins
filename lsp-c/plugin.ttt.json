@@ -1,0 +1,11 @@
+{
+  "name": "lsp-c",
+  "description": "Auto-configure clangd as the C/C++ language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

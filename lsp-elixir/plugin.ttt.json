@@ -1,0 +1,11 @@
+{
+  "name": "lsp-elixir",
+  "description": "Auto-configure elixir-ls as the Elixir language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

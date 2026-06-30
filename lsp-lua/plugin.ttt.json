@@ -1,0 +1,11 @@
+{
+  "name": "lsp-lua",
+  "description": "Auto-configure lua-language-server as the Lua language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "lsp-php",
+  "description": "Auto-configure phpactor as the PHP language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

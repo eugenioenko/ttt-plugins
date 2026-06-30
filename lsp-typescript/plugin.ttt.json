@@ -1,0 +1,11 @@
+{
+  "name": "lsp-typescript",
+  "description": "Auto-configure typescript-language-server as the TypeScript language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

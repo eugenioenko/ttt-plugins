@@ -1,0 +1,11 @@
+{
+  "name": "lsp-tailwindcss",
+  "description": "Auto-configure tailwindcss-language-server as the Tailwind CSS language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

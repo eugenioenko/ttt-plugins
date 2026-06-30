@@ -1,0 +1,11 @@
+{
+  "name": "lsp-html",
+  "description": "Auto-configure vscode-html-language-server as the HTML language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}

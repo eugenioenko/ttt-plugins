@@ -30,6 +30,37 @@ Formatter plugins auto-configure external formatters via the `formatters` settin
 | [formatter-clang-format](formatter-clang-format/) | C, C++ | `clang-format` |
 | [formatter-shfmt](formatter-shfmt/) | Shell (sh, bash) | `shfmt` |
 
+## LSP Servers
+
+LSP plugins auto-configure language servers via the `lsp.servers` setting. Install the plugin and the language server binary to enable autocomplete, hover, and diagnostics.
+
+| Plugin | Language | Binary |
+|--------|----------|--------|
+| [lsp-go](lsp-go/) | Go | `gopls` |
+| [lsp-typescript](lsp-typescript/) | TypeScript/JavaScript | `typescript-language-server` |
+| [lsp-python](lsp-python/) | Python | `pyright-langserver` |
+| [lsp-c](lsp-c/) | C/C++ | `clangd` |
+| [lsp-rust](lsp-rust/) | Rust | `rust-analyzer` |
+| [lsp-lua](lsp-lua/) | Lua | `lua-language-server` |
+| [lsp-zig](lsp-zig/) | Zig | `zls` |
+| [lsp-vue](lsp-vue/) | Vue | `vue-language-server` |
+| [lsp-svelte](lsp-svelte/) | Svelte | `svelteserver` |
+| [lsp-css](lsp-css/) | CSS/SCSS/LESS | `vscode-css-language-server` |
+| [lsp-html](lsp-html/) | HTML | `vscode-html-language-server` |
+| [lsp-json](lsp-json/) | JSON | `vscode-json-language-server` |
+| [lsp-yaml](lsp-yaml/) | YAML | `yaml-language-server` |
+| [lsp-bash](lsp-bash/) | Shell | `bash-language-server` |
+| [lsp-docker](lsp-docker/) | Dockerfile | `docker-langserver` |
+| [lsp-tailwindcss](lsp-tailwindcss/) | Tailwind CSS | `tailwindcss-language-server` |
+| [lsp-kotlin](lsp-kotlin/) | Kotlin | `kotlin-language-server` |
+| [lsp-java](lsp-java/) | Java | `jdtls` |
+| [lsp-ruby](lsp-ruby/) | Ruby | `ruby-lsp` |
+| [lsp-dart](lsp-dart/) | Dart | `dart` |
+| [lsp-elixir](lsp-elixir/) | Elixir | `elixir-ls` |
+| [lsp-php](lsp-php/) | PHP | `phpactor` |
+| [lsp-terraform](lsp-terraform/) | Terraform | `terraform-ls` |
+| [lsp-markdown](lsp-markdown/) | Markdown | `marksman` |
+
 ## Installation
 
 Plugins can be installed directly from ttt:

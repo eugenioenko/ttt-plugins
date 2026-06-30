@@ -1,0 +1,11 @@
+{
+  "name": "lsp-markdown",
+  "description": "Auto-configure marksman as the Markdown language server",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}
