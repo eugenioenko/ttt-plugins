@@ -1,0 +1,14 @@
+{
+  "name": "color-picker",
+  "description": "Open a drawer with color swatches. Click a color to insert its hex value at the cursor.",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "panel.drawer": true,
+    "commands": true,
+    "keybindings": true,
+    "editor.read": true,
+    "editor.write": true
+  }
+}

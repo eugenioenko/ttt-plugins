@@ -1,0 +1,13 @@
+{
+  "name": "http-client",
+  "version": "0.1.0",
+  "description": "Simple HTTP client for testing APIs",
+  "entry": "plugin.lua",
+  "permissions": {
+    "panel.drawer": true,
+    "commands": true,
+    "keybindings": true,
+    "network.http": true,
+    "editor.write": true
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "todo-scanner",
+  "description": "Scans workspace for TODO, FIXME, HACK, and NOTE comments",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "panel.bottom": true,
+    "commands": true,
+    "system.exec": ["rg"]
+  }
+}

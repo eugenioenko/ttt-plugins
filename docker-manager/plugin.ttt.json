@@ -1,0 +1,13 @@
+{
+  "name": "docker-manager",
+  "description": "Manage Docker containers, images and volumes",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "init.lua",
+  "permissions": {
+    "panel.sidebar": true,
+    "commands": true,
+    "keybindings": true,
+    "system.exec": ["docker"]
+  }
+}

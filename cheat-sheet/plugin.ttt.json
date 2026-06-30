@@ -1,0 +1,14 @@
+{
+  "name": "cheat-sheet",
+  "description": "Fetch programming cheat sheets from cheat.sh and display them in an editor tab",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "panel.sidebar": true,
+    "panel.editor": true,
+    "commands": true,
+    "keybindings": true,
+    "network.http": true
+  }
+}

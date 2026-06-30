@@ -1,0 +1,15 @@
+{
+  "name": "go-test-runner",
+  "description": "Run Go tests and view results in a sidebar panel",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "panel.sidebar": true,
+    "commands": true,
+    "keybindings": true,
+    "system.exec": ["go"],
+    "editor.read": true,
+    "editor.write": true
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "markdown-preview",
+  "description": "Preview markdown files with styled rendering",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "panel.editor": true,
+    "commands": true,
+    "editor.read": true
+  }
+}

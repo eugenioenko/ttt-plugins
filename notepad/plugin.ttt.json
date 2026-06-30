@@ -1,0 +1,14 @@
+{
+  "name": "notepad",
+  "description": "Persistent scratchpad for jotting down notes per workspace",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "panel.bottom": true,
+    "fs.read": true,
+    "fs.write": true,
+    "commands": true,
+    "system.exec": ["date", "pwd"]
+  }
+}

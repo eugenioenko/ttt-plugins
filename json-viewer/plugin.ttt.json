@@ -1,0 +1,12 @@
+{
+  "name": "json-viewer",
+  "description": "Preview JSON files as an expandable tree",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "panel.editor": true,
+    "commands": true,
+    "editor.read": true
+  }
+}
