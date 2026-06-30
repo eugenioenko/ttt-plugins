@@ -1,0 +1,11 @@
+{
+  "name": "formatter-black",
+  "description": "Auto-configure Black as the Python formatter",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["formatters.*"]
+  }
+}

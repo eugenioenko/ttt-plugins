@@ -1,0 +1,11 @@
+{
+  "name": "formatter-prettier",
+  "description": "Auto-configure Prettier for JS, TS, CSS, HTML, JSON, Markdown, and YAML",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["formatters.*"]
+  }
+}

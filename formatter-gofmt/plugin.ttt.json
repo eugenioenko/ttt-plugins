@@ -1,0 +1,11 @@
+{
+  "name": "formatter-gofmt",
+  "description": "Auto-configure gofmt as the Go formatter",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["formatters.*"]
+  }
+}

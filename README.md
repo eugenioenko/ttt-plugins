@@ -16,6 +16,20 @@ Community plugins for the [ttt terminal text editor](https://github.com/eugenioe
 | [notepad](notepad/) | Scratchpad for quick notes |
 | [todo-scanner](todo-scanner/) | Scan workspace for TODO/FIXME/HACK/NOTE comments |
 
+## Formatters
+
+Formatter plugins auto-configure external formatters via the `formatters` setting. Install the plugin and the formatter binary, then use `Ctrl+K F` to format or enable `editor.formatOnSave`.
+
+| Plugin | Language(s) | Binary |
+|--------|-------------|--------|
+| [formatter-gofmt](formatter-gofmt/) | Go | `gofmt` |
+| [formatter-prettier](formatter-prettier/) | JS, TS, JSX, TSX, CSS, HTML, JSON, Markdown, YAML | `prettier` |
+| [formatter-black](formatter-black/) | Python | `black` |
+| [formatter-rustfmt](formatter-rustfmt/) | Rust | `rustfmt` |
+| [formatter-stylua](formatter-stylua/) | Lua | `stylua` |
+| [formatter-clang-format](formatter-clang-format/) | C, C++ | `clang-format` |
+| [formatter-shfmt](formatter-shfmt/) | Shell (sh, bash) | `shfmt` |
+
 ## Installation
 
 Plugins can be installed directly from ttt:

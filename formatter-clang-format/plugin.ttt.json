@@ -1,0 +1,11 @@
+{
+  "name": "formatter-clang-format",
+  "description": "Auto-configure clang-format for C and C++ files",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["formatters.*"]
+  }
+}
