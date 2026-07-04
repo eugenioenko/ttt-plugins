@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Simple HTTP client for testing APIs",
   "entry": "plugin.lua",
+  "api": 1,
   "permissions": {
     "panel.drawer": true,
     "commands": true,

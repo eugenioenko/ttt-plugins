@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "author": "eugenioenko",
   "entry": "plugin.lua",
+  "api": 1,
   "permissions": {
     "panel.sidebar": true,
     "panel.editor": true,
