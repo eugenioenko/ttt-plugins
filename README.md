@@ -14,6 +14,7 @@ Community plugins for the [ttt terminal text editor](https://github.com/eugenioe
 | [json-viewer](json-viewer/) | JSON tree viewer for the current file |
 | [markdown-preview](markdown-preview/) | Markdown preview panel |
 | [notepad](notepad/) | Scratchpad for quick notes |
+| [spell-demo](spell-demo/) | Demo spell-checker showing the diagnostics + context-menu API |
 | [todo-scanner](todo-scanner/) | Scan workspace for TODO/FIXME/HACK/NOTE comments |
 
 ## Formatters

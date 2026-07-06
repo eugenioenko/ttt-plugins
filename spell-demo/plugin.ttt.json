@@ -1,0 +1,15 @@
+{
+  "name": "spell-demo",
+  "description": "Demo spell-checker showing the plugin diagnostics + editor context-menu API (tiny built-in dictionary, no aspell)",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "api": 1,
+  "permissions": {
+    "editor.read": true,
+    "editor.write": true,
+    "editor.diagnostics": true,
+    "events.editor": true,
+    "events.file": true
+  }
+}
