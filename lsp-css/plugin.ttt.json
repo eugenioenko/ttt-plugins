@@ -1,5 +1,6 @@
 {
   "name": "lsp-css",
+  "displayName": "CSS Language Server",
   "description": "Auto-configure vscode-css-language-server as the CSS language server",
   "version": "0.1.0",
   "author": "eugenioenko",

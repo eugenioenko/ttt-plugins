@@ -1,5 +1,6 @@
 {
   "name": "cheat-sheet",
+  "displayName": "Cheat Sheet",
   "description": "Fetch programming cheat sheets from cheat.sh and display them in an editor tab",
   "version": "0.1.0",
   "author": "eugenioenko",

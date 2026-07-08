@@ -1,5 +1,6 @@
 {
   "name": "json-viewer",
+  "displayName": "JSON Viewer",
   "description": "Preview JSON files as an expandable tree",
   "version": "0.1.0",
   "author": "eugenioenko",

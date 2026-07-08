@@ -1,5 +1,6 @@
 {
   "name": "formatter-clang-format",
+  "displayName": "clang-format Formatter",
   "description": "Auto-configure clang-format for C and C++ files",
   "version": "0.1.0",
   "author": "eugenioenko",

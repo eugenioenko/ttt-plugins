@@ -1,5 +1,6 @@
 {
   "name": "formatter-rustfmt",
+  "displayName": "rustfmt Formatter",
   "description": "Auto-configure rustfmt as the Rust formatter",
   "version": "0.1.0",
   "author": "eugenioenko",

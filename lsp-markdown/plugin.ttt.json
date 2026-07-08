@@ -1,5 +1,6 @@
 {
   "name": "lsp-markdown",
+  "displayName": "Markdown Language Server",
   "description": "Auto-configure marksman as the Markdown language server",
   "version": "0.1.0",
   "author": "eugenioenko",

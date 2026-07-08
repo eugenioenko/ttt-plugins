@@ -1,5 +1,6 @@
 {
   "name": "lsp-dart",
+  "displayName": "Dart Language Server",
   "description": "Auto-configure dart language-server as the Dart language server",
   "version": "0.1.0",
   "author": "eugenioenko",

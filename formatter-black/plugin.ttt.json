@@ -1,5 +1,6 @@
 {
   "name": "formatter-black",
+  "displayName": "Black Formatter",
   "description": "Auto-configure Black as the Python formatter",
   "version": "0.1.0",
   "author": "eugenioenko",

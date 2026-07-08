@@ -1,5 +1,6 @@
 {
   "name": "lsp-rust",
+  "displayName": "Rust Language Server",
   "description": "Auto-configure rust-analyzer as the Rust language server",
   "version": "0.1.0",
   "author": "eugenioenko",

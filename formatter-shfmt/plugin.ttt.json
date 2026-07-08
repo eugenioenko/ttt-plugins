@@ -1,5 +1,6 @@
 {
   "name": "formatter-shfmt",
+  "displayName": "shfmt Formatter",
   "description": "Auto-configure shfmt as the shell script formatter",
   "version": "0.1.0",
   "author": "eugenioenko",

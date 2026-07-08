@@ -1,5 +1,6 @@
 {
   "name": "lsp-php",
+  "displayName": "PHP Language Server",
   "description": "Auto-configure phpactor as the PHP language server",
   "version": "0.1.0",
   "author": "eugenioenko",

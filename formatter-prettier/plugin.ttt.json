@@ -1,5 +1,6 @@
 {
   "name": "formatter-prettier",
+  "displayName": "Prettier Formatter",
   "description": "Auto-configure Prettier for JS, TS, CSS, HTML, JSON, Markdown, and YAML",
   "version": "0.1.0",
   "author": "eugenioenko",

@@ -1,5 +1,6 @@
 {
   "name": "lsp-json",
+  "displayName": "JSON Language Server",
   "description": "Auto-configure vscode-json-language-server as the JSON language server",
   "version": "0.1.0",
   "author": "eugenioenko",

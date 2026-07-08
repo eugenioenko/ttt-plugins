@@ -1,5 +1,6 @@
 {
   "name": "formatter-gofmt",
+  "displayName": "gofmt Formatter",
   "description": "Auto-configure gofmt as the Go formatter",
   "version": "0.1.0",
   "author": "eugenioenko",

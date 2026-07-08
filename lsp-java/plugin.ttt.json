@@ -1,5 +1,6 @@
 {
   "name": "lsp-java",
+  "displayName": "Java Language Server",
   "description": "Auto-configure jdtls as the Java language server",
   "version": "0.1.0",
   "author": "eugenioenko",

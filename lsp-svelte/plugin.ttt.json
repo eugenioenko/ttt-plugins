@@ -1,5 +1,6 @@
 {
   "name": "lsp-svelte",
+  "displayName": "Svelte Language Server",
   "description": "Auto-configure svelteserver as the Svelte language server",
   "version": "0.1.0",
   "author": "eugenioenko",

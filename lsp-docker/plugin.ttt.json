@@ -1,5 +1,6 @@
 {
   "name": "lsp-docker",
+  "displayName": "Docker Language Server",
   "description": "Auto-configure docker-langserver as the Dockerfile language server",
   "version": "0.1.0",
   "author": "eugenioenko",

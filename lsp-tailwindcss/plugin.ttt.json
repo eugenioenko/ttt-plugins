@@ -1,5 +1,6 @@
 {
   "name": "lsp-tailwindcss",
+  "displayName": "Tailwind CSS Language Server",
   "description": "Auto-configure tailwindcss-language-server as the Tailwind CSS language server",
   "version": "0.1.0",
   "author": "eugenioenko",

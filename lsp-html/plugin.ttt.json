@@ -1,5 +1,6 @@
 {
   "name": "lsp-html",
+  "displayName": "HTML Language Server",
   "description": "Auto-configure vscode-html-language-server as the HTML language server",
   "version": "0.1.0",
   "author": "eugenioenko",

@@ -1,5 +1,6 @@
 {
   "name": "lsp-elixir",
+  "displayName": "Elixir Language Server",
   "description": "Auto-configure elixir-ls as the Elixir language server",
   "version": "0.1.0",
   "author": "eugenioenko",

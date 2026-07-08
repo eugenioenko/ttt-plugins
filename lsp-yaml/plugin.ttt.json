@@ -1,5 +1,6 @@
 {
   "name": "lsp-yaml",
+  "displayName": "YAML Language Server",
   "description": "Auto-configure yaml-language-server as the YAML language server",
   "version": "0.1.0",
   "author": "eugenioenko",
