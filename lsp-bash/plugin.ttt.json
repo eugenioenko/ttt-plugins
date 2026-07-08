@@ -1,5 +1,6 @@
 {
   "name": "lsp-bash",
+  "displayName": "Bash Language Server",
   "description": "Auto-configure bash-language-server as the Shell language server",
   "version": "0.1.0",
   "author": "eugenioenko",

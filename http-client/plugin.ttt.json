@@ -1,5 +1,6 @@
 {
   "name": "http-client",
+  "displayName": "HTTP Client",
   "version": "0.1.0",
   "description": "Simple HTTP client for testing APIs",
   "entry": "plugin.lua",

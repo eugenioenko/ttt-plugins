@@ -1,5 +1,6 @@
 {
   "name": "lsp-typescript",
+  "displayName": "TypeScript Language Server",
   "description": "Auto-configure typescript-language-server as the TypeScript language server",
   "version": "0.1.0",
   "author": "eugenioenko",

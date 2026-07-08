@@ -1,5 +1,6 @@
 {
   "name": "lsp-terraform",
+  "displayName": "Terraform Language Server",
   "description": "Auto-configure terraform-ls as the Terraform language server",
   "version": "0.1.0",
   "author": "eugenioenko",

@@ -1,5 +1,6 @@
 {
   "name": "docker-manager",
+  "displayName": "Docker Manager",
   "description": "Manage Docker containers, images and volumes",
   "version": "0.1.0",
   "author": "eugenioenko",

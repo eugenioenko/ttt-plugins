@@ -1,5 +1,6 @@
 {
   "name": "lsp-python",
+  "displayName": "Python Language Server",
   "description": "Auto-configure pyright as the Python language server",
   "version": "0.1.0",
   "author": "eugenioenko",

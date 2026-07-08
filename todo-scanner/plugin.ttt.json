@@ -1,5 +1,6 @@
 {
   "name": "todo-scanner",
+  "displayName": "TODO Scanner",
   "description": "Scans workspace for TODO, FIXME, HACK, and NOTE comments",
   "version": "0.1.0",
   "author": "eugenioenko",

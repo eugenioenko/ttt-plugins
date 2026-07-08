@@ -1,5 +1,6 @@
 {
   "name": "markdown-preview",
+  "displayName": "Markdown Preview",
   "description": "Preview markdown files with styled rendering",
   "version": "0.1.0",
   "author": "eugenioenko",

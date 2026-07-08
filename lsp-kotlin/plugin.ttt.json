@@ -1,5 +1,6 @@
 {
   "name": "lsp-kotlin",
+  "displayName": "Kotlin Language Server",
   "description": "Auto-configure kotlin-language-server as the Kotlin language server",
   "version": "0.1.0",
   "author": "eugenioenko",

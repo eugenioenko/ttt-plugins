@@ -1,5 +1,6 @@
 {
   "name": "lsp-vue",
+  "displayName": "Vue Language Server",
   "description": "Auto-configure vue-language-server as the Vue language server",
   "version": "0.1.0",
   "author": "eugenioenko",

@@ -1,5 +1,6 @@
 {
   "name": "notepad",
+  "displayName": "Notepad",
   "description": "Persistent scratchpad for jotting down notes per workspace",
   "version": "0.1.0",
   "author": "eugenioenko",

@@ -1,5 +1,6 @@
 {
   "name": "color-picker",
+  "displayName": "Color Picker",
   "description": "Open a drawer with color swatches. Click a color to insert its hex value at the cursor.",
   "version": "0.1.0",
   "author": "eugenioenko",

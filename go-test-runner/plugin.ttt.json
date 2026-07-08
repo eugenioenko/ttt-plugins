@@ -1,5 +1,6 @@
 {
   "name": "go-test-runner",
+  "displayName": "Go Test Runner",
   "description": "Run Go tests and view results in a sidebar panel",
   "version": "0.1.0",
   "author": "eugenioenko",

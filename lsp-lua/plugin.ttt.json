@@ -1,5 +1,6 @@
 {
   "name": "lsp-lua",
+  "displayName": "Lua Language Server",
   "description": "Auto-configure lua-language-server as the Lua language server",
   "version": "0.1.0",
   "author": "eugenioenko",

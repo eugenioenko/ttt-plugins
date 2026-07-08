@@ -1,5 +1,6 @@
 {
   "name": "lsp-go",
+  "displayName": "Go Language Server",
   "description": "Auto-configure gopls as the Go language server",
   "version": "0.1.0",
   "author": "eugenioenko",
