@@ -108,6 +108,15 @@ local function container_action(action, name, panel)
 	end)
 end
 
+local function is_container_running(name)
+	for _, c in ipairs(containers) do
+		if c.name == name then
+			return c.running
+		end
+	end
+	return false
+end
+
 local function container_start(name, panel)
 	container_action("start", name, panel)
 end
@@ -129,7 +138,7 @@ local function container_remove(name, panel)
 			end
 			refresh_containers(panel)
 		end)
-	end)
+	end, "Delete")
 end
 
 -- Image actions
@@ -144,7 +153,7 @@ local function image_remove(id, panel)
 			end
 			refresh_images(panel)
 		end)
-	end)
+	end, "Delete")
 end
 
 -- Volume actions
@@ -159,14 +168,15 @@ local function volume_remove(name, panel)
 			end
 			refresh_volumes(panel)
 		end)
-	end)
+	end, "Delete")
 end
 
 -- Build list items
 local function container_items()
 	local items = {}
 	for _, c in ipairs(containers) do
-		local icon = c.running and "●" or "○"
+		local icon = c.running and "▶" or "■"
+		local icon_style = c.running and "success" or "danger"
 		local actions = {}
 		if c.running then
 			table.insert(actions, { icon = "■", command = "stop" })
@@ -179,6 +189,7 @@ local function container_items()
 			id = c.name,
 			label = c.name,
 			icon = icon,
+			icon_style = icon_style,
 			badge = c.image,
 			actions = actions,
 		})
@@ -289,10 +300,11 @@ ttt.register({
 				cmd_prune_volumes()
 			elseif command == "docker.sidebarAction.help" then
 				ttt.show_info("Docker Shortcuts", {
+					{ key = "Enter / Space", value = "Toggle start / stop container" },
+					{ key = "d", value = "Delete container, image or volume" },
 					{ key = "r", value = "Refresh all" },
 					{ key = "Right-click", value = "Context menu on item" },
 					{ key = "Up / Down", value = "Navigate items" },
-					{ key = "Enter", value = "Expand / collapse" },
 					{ key = "Ctrl+K r", value = "Refresh (global)" },
 				})
 			end
@@ -319,8 +331,16 @@ ttt.register({
 						render = function(bp)
 							bp:list({
 								items = container_items(),
+								select_on_click = true,
+								key_commands = { d = "remove" },
 								on_command = function(command, node)
-									if command == "start" then
+									if command == "activate" then
+										if is_container_running(node.id) then
+											container_stop(node.id, panel)
+										else
+											container_start(node.id, panel)
+										end
+									elseif command == "start" then
 										container_start(node.id, panel)
 									elseif command == "stop" then
 										container_stop(node.id, panel)
@@ -352,6 +372,7 @@ ttt.register({
 						render = function(bp)
 							bp:list({
 								items = image_items(),
+								key_commands = { d = "remove" },
 								on_command = function(command, node)
 									if command == "remove" then
 										image_remove(node.id, panel)
@@ -375,6 +396,7 @@ ttt.register({
 						render = function(bp)
 							bp:list({
 								items = volume_items(),
+								key_commands = { d = "remove" },
 								on_command = function(command, node)
 									if command == "remove" then
 										volume_remove(node.id, panel)
