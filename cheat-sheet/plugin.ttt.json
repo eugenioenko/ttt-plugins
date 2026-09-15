@@ -11,6 +11,8 @@
     "panel.editor": true,
     "commands": true,
     "keybindings": true,
-    "network.http": true
+    "network.http": [
+      "cheat.sh"
+    ]
   }
 }
