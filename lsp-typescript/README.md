@@ -7,8 +7,10 @@ Auto-configures `typescript-language-server` as the TypeScript/JavaScript langua
 Install the language server binary:
 
 ```sh
-npm install -g typescript-language-server typescript
+npm install -g typescript-language-server typescript@6
 ```
+
+> **Note:** TypeScript 7+ removed `tsserver`, which this plugin requires. Use TypeScript 6 or earlier.
 
 ## What it does
 
