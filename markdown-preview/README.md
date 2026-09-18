@@ -10,4 +10,7 @@ Preview markdown files with styled rendering.
 
 ## Usage
 
-Open a `.md` file, then run `Preview: Markdown` from the command palette (`Ctrl+P`).
+Open a `.md` file, then either run `Preview: Markdown` from the command palette
+(`Ctrl+P`) or right-click in the buffer and pick **Preview Markdown**.
+
+The right-click entry only appears on markdown files.
