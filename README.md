@@ -26,6 +26,7 @@ Formatter plugins auto-configure external formatters via the `formatters` settin
 | [formatter-gofmt](formatter-gofmt/) | Go | `gofmt` |
 | [formatter-prettier](formatter-prettier/) | JS, TS, JSX, TSX, CSS, HTML, JSON, Markdown, YAML | `prettier` |
 | [formatter-black](formatter-black/) | Python | `black` |
+| [formatter-ruff](formatter-ruff/) | Python | `ruff` |
 | [formatter-rustfmt](formatter-rustfmt/) | Rust | `rustfmt` |
 | [formatter-stylua](formatter-stylua/) | Lua | `stylua` |
 | [formatter-clang-format](formatter-clang-format/) | C, C++ | `clang-format` |
@@ -40,6 +41,7 @@ LSP plugins auto-configure language servers via the `lsp.servers` setting. Insta
 | [lsp-go](lsp-go/) | Go | `gopls` |
 | [lsp-typescript](lsp-typescript/) | TypeScript/JavaScript | `typescript-language-server` |
 | [lsp-python](lsp-python/) | Python | `pyright-langserver` |
+| [lsp-ruff](lsp-ruff/) | Python | `ruff` |
 | [lsp-c](lsp-c/) | C/C++ | `clangd` |
 | [lsp-rust](lsp-rust/) | Rust | `rust-analyzer` |
 | [lsp-lua](lsp-lua/) | Lua | `lua-language-server` |
