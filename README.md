@@ -61,6 +61,7 @@ LSP plugins auto-configure language servers via the `lsp.servers` setting. Insta
 | [lsp-php](lsp-php/) | PHP | `phpactor` |
 | [lsp-terraform](lsp-terraform/) | Terraform | `terraform-ls` |
 | [lsp-markdown](lsp-markdown/) | Markdown | `marksman` |
+| [lsp-haskell](lsp-haskell/) | Haskell | `haskell-language-server-wrapper` |
 
 ## Installation
 
