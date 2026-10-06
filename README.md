@@ -32,6 +32,16 @@ Formatter plugins auto-configure external formatters via the `formatters` settin
 | [formatter-clang-format](formatter-clang-format/) | C, C++ | `clang-format` |
 | [formatter-shfmt](formatter-shfmt/) | Shell (sh, bash) | `shfmt` |
 
+## Grammars
+
+Grammar plugins add syntax highlighting for languages that ttt does not embed. Install the plugin and open a matching file; no binary is needed.
+
+| Plugin | Language(s) | Files |
+|--------|-------------|-------|
+| [lang-git](lang-git/) | Git commit messages, rebase todo lists | `COMMIT_EDITMSG`, `git-rebase-todo` |
+| [lang-astro](lang-astro/) | Astro | `.astro` |
+| [lang-just](lang-just/) | Just | `justfile`, `.just` |
+
 ## LSP Servers
 
 LSP plugins auto-configure language servers via the `lsp.servers` setting. Install the plugin and the language server binary to enable autocomplete, hover, and diagnostics.

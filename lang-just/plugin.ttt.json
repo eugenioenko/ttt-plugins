@@ -1,0 +1,19 @@
+{
+  "name": "lang-just",
+  "displayName": "Just",
+  "description": "Syntax highlighting for just command runner files (justfile, .just)",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "api": 1,
+  "grammars": [
+    {
+      "path": "syntaxes/just.tmLanguage.json",
+      "language": "Just",
+      "fileTypes": [
+        "justfile",
+        ".justfile",
+        "just"
+      ]
+    }
+  ]
+}

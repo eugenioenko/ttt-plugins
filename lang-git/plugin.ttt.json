@@ -1,0 +1,27 @@
+{
+  "name": "lang-git",
+  "displayName": "Git Commit & Rebase",
+  "description": "Syntax highlighting for git commit messages (COMMIT_EDITMSG, MERGE_MSG, TAG_EDITMSG) and interactive rebase todo lists",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "api": 1,
+  "grammars": [
+    {
+      "path": "syntaxes/git-commit.tmLanguage.json",
+      "language": "Git Commit",
+      "fileTypes": [
+        "COMMIT_EDITMSG",
+        "MERGE_MSG",
+        "TAG_EDITMSG",
+        "SQUASH_MSG"
+      ]
+    },
+    {
+      "path": "syntaxes/git-rebase.tmLanguage.json",
+      "language": "Git Rebase",
+      "fileTypes": [
+        "git-rebase-todo"
+      ]
+    }
+  ]
+}
