@@ -1,6 +1,6 @@
 {
   "name": "lang-astro",
-  "displayName": "Astro",
+  "displayName": "Astro Syntax Highlighting",
   "description": "Syntax highlighting for Astro components (.astro)",
   "version": "0.1.0",
   "author": "eugenioenko",

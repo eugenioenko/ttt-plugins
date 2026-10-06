@@ -1,6 +1,6 @@
 {
   "name": "lang-git",
-  "displayName": "Git Commit & Rebase",
+  "displayName": "Git Syntax Highlighting",
   "description": "Syntax highlighting for git commit messages (COMMIT_EDITMSG, MERGE_MSG, TAG_EDITMSG) and interactive rebase todo lists",
   "version": "0.1.0",
   "author": "eugenioenko",
