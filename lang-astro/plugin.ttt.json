@@ -1,0 +1,17 @@
+{
+  "name": "lang-astro",
+  "displayName": "Astro",
+  "description": "Syntax highlighting for Astro components (.astro)",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "api": 1,
+  "grammars": [
+    {
+      "path": "syntaxes/astro.tmLanguage.json",
+      "language": "Astro",
+      "fileTypes": [
+        "astro"
+      ]
+    }
+  ]
+}
