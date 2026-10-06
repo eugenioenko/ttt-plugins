@@ -1,6 +1,6 @@
 {
   "name": "lang-just",
-  "displayName": "Just",
+  "displayName": "Just Syntax Highlighting",
   "description": "Syntax highlighting for just command runner files (justfile, .just)",
   "version": "0.1.0",
   "author": "eugenioenko",
