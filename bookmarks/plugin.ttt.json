@@ -1,0 +1,18 @@
+{
+  "name": "bookmarks",
+  "displayName": "Bookmarks",
+  "description": "Toggle line bookmarks from the gutter or context menu and browse them in the sidebar",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "api": 1,
+  "permissions": {
+    "panel.sidebar": true,
+    "commands": true,
+    "editor.read": true,
+    "editor.bookmarks": true,
+    "events.editor": true,
+    "events.file": true,
+    "storage": true
+  }
+}

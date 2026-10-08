@@ -6,6 +6,7 @@ Community plugins for the [ttt terminal text editor](https://github.com/eugenioe
 
 | Plugin | Description |
 |--------|-------------|
+| [bookmarks](bookmarks/) | Bookmark lines from the gutter and browse them in the sidebar |
 | [cheat-sheet](cheat-sheet/) | Interactive cheat sheet browser |
 | [color-picker](color-picker/) | Color picker with hex/RGB support |
 | [docker-manager](docker-manager/) | Docker container management sidebar |
