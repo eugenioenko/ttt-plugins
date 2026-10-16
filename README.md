@@ -95,4 +95,4 @@ Each plugin lives in its own subdirectory with a `plugin.ttt.json` manifest.
 
 ## Creating a Plugin
 
-See the [Plugin Documentation](https://github.com/eugenioenko/ttt/blob/main/docs/PLUGINS.md) for the full API reference.
+See the [plugin authoring guide](https://tttedit.dev/guides/plugin-authoring/) for the full API reference, and [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a plugin to this repo.
