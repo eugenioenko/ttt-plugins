@@ -18,6 +18,7 @@ Community plugins for the [ttt terminal text editor](https://github.com/eugenioe
 | [omarchy-theme](omarchy-theme/) | Generate a TTT theme snapshot from the active Omarchy palette | [@danielmrdev](https://github.com/danielmrdev) |
 | [pdf-viewer](https://github.com/sercanatalik/ttt-pdf) | View and search PDFs in an editor tab, with fit width and auto-reload | [@sercanatalik](https://github.com/sercanatalik) |
 | [port-finder](port-finder/) | Find and kill processes listening on TCP ports | |
+| [pr-review](pr-review/) | Browse GitHub pull requests, read comments, and submit reviews or approvals |
 | [todo-scanner](todo-scanner/) | Scan workspace for TODO/FIXME/HACK/NOTE comments | |
 
 ## Formatters

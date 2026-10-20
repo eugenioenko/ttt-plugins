@@ -1,0 +1,18 @@
+{
+  "name": "pr-review",
+  "displayName": "PR Review",
+  "description": "Browse GitHub pull requests, inspect native diffs, and submit reviews.",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "init.lua",
+  "api": 1,
+  "permissions": {
+    "panel.sidebar": true,
+    "commands": true,
+    "storage": true,
+    "system.exec": [
+      "gh"
+    ],
+    "panel.drawer": true
+  }
+}
