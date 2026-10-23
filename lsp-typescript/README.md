@@ -10,10 +10,12 @@ Install the language server binary:
 npm install -g typescript-language-server typescript@6
 ```
 
-> **Note:** TypeScript 7+ removed `tsserver`, which this plugin requires. Use TypeScript 6 or earlier.
+> **Note:** TypeScript 7+ removed `tsserver`, which this plugin requires. For TypeScript 7+, use [lsp-typescript-native](../lsp-typescript-native/).
 
 ## What it does
 
 When installed, this plugin sets `lsp.servers.typescript` in your settings to enable LSP features (autocomplete, hover, diagnostics) for TypeScript/JavaScript files.
 
 When uninstalled, the setting is automatically removed.
+
+Both TypeScript plugins configure `lsp.servers.typescript`; install only one. Installing both overwrites the setting, and uninstalling either removes it.

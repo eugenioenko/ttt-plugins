@@ -48,12 +48,13 @@ Grammar plugins add syntax highlighting for languages that ttt does not embed. I
 
 ## LSP Servers
 
-LSP plugins auto-configure language servers via the `lsp.servers` setting. Install the plugin and the language server binary to enable autocomplete, hover, and diagnostics.
+LSP plugins auto-configure language servers via the `lsp.servers` setting. Install the plugin and server binary to enable supported LSP features; see each plugin's README for capabilities and limitations.
 
 | Plugin | Language | Binary | Contributed by |
 |--------|----------|--------|----------------|
 | [lsp-go](lsp-go/) | Go | `gopls` | |
-| [lsp-typescript](lsp-typescript/) | TypeScript/JavaScript | `typescript-language-server` | |
+| [lsp-typescript](lsp-typescript/) | TypeScript/JavaScript (TS 6 and earlier) | `typescript-language-server` | |
+| [lsp-typescript-native](lsp-typescript-native/) | TypeScript/JavaScript (TS 7+) | `tsc --lsp --stdio` | [@danielmrdev](https://github.com/danielmrdev) |
 | [lsp-python](lsp-python/) | Python | `pyright-langserver` | |
 | [lsp-ruff](lsp-ruff/) | Python | `ruff` | [@RhenCloud](https://github.com/RhenCloud) |
 | [lsp-c](lsp-c/) | C/C++ | `clangd` | |

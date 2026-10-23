@@ -1,0 +1,13 @@
+{
+  "name": "lsp-typescript-native",
+  "displayName": "TypeScript 7 Native Language Server",
+  "description": "Auto-configure TypeScript 7's built-in language server for TypeScript and JavaScript",
+  "version": "0.1.0",
+  "author": "danielmrdev",
+  "entry": "plugin.lua",
+  "api": 1,
+  "permissions": {
+    "settings": true,
+    "settings_keys": ["lsp.*"]
+  }
+}
