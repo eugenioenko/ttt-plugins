@@ -1,0 +1,13 @@
+{
+  "name": "theme-vermeer",
+  "displayName": "Vermeer Theme",
+  "description": "Vermeer color theme for ttt",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "api": 2,
+  "themes": [
+    {
+      "path": "themes/vermeer.json"
+    }
+  ]
+}
