@@ -46,6 +46,14 @@ Grammar plugins add syntax highlighting for languages that ttt does not embed. I
 | [lang-astro](lang-astro/) | Astro | `.astro` |
 | [lang-just](lang-just/) | Just | `justfile`, `.just` |
 
+## Themes
+
+Theme plugins contribute color themes without Lua or filesystem permissions. Requires ttt with manifest theme contributions (eugenioenko/ttt#1247). After installation, select the theme with **Switch Theme**.
+
+| Plugin | Theme |
+|--------|-------|
+| [theme-catppuccin-mocha](theme-catppuccin-mocha/) | Catppuccin Mocha |
+
 ## LSP Servers
 
 LSP plugins auto-configure language servers via the `lsp.servers` setting. Install the plugin and server binary to enable supported LSP features; see each plugin's README for capabilities and limitations.
