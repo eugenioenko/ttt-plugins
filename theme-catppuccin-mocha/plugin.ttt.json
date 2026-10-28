@@ -1,0 +1,13 @@
+{
+  "name": "theme-catppuccin-mocha",
+  "displayName": "Catppuccin Mocha Theme",
+  "description": "Catppuccin Mocha color theme for ttt",
+  "version": "0.1.0",
+  "author": "salmonumbrella",
+  "api": 2,
+  "themes": [
+    {
+      "path": "themes/catppuccin-mocha.json"
+    }
+  ]
+}
