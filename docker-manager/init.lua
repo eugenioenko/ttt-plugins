@@ -258,6 +258,31 @@ local function cmd_switch_runtime()
 	end
 end
 
+local function render_runtime_footer(panel)
+	local active_runtime = runtime()
+	panel:divider()
+	panel:hstack({
+		height = 1,
+		padding_left = 1,
+		padding_right = 1,
+		render = function(p)
+			p:label({ text = "Runtime", style = "muted" })
+			p:dropdown({
+				label = (active_runtime == "docker" and "Docker" or "Podman") .. " ▼",
+				entries = {
+					{ label = "Docker", command = "docker", checked = active_runtime == "docker" },
+					{ label = "Podman", command = "podman", checked = active_runtime == "podman" },
+				},
+				on_menu = function(command)
+					if command ~= runtime() then
+						cmd_switch_runtime()
+					end
+				end,
+			})
+		end,
+	})
+end
+
 local function cmd_prune_containers()
 	ttt.confirm("Prune all stopped containers?", function()
 		ttt.log("info", "pruning stopped containers...")
@@ -346,11 +371,14 @@ ttt.register({
 			end
 
 			if loading then
-				panel:label({ text = "Loading...", style = "muted" })
+				panel:box({
+					render = function(p)
+						p:label({ text = "Loading...", style = "muted" })
+					end,
+				})
+				render_runtime_footer(panel)
 				return
 			end
-
-			panel:label({ text = "Runtime: " .. runtime(), style = "muted", padding_left = 1, padding_right = 1 })
 
 			-- Containers section
 			panel:vstack({
@@ -440,6 +468,7 @@ ttt.register({
 					})
 				end,
 			})
+			render_runtime_footer(panel)
 		end,
 
 		on_event = function(event)

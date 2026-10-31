@@ -32,7 +32,7 @@ Choose the container runtime in `settings.json`. Use `"docker"` (the default) or
 }
 ```
 
-The sidebar shows the active runtime. You can also switch from the sidebar menu or the command palette. After editing `settings.json` by hand, reload settings and refresh the sidebar with `R`.
+The Runtime footer at the bottom of the sidebar shows the active runtime. Click its selector to choose Docker or Podman; the current runtime has a checkmark. You can also switch from the sidebar menu or the command palette. After editing `settings.json` by hand, reload settings and refresh the sidebar with `R`.
 
 ## Requirements
 
