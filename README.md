@@ -9,7 +9,7 @@ Community plugins for the [ttt terminal text editor](https://github.com/eugenioe
 | [bookmarks](bookmarks/) | Bookmark lines from the gutter and browse them in the sidebar | |
 | [cheat-sheet](cheat-sheet/) | Interactive cheat sheet browser | |
 | [color-picker](color-picker/) | Color picker with hex/RGB support | |
-| [docker-manager](docker-manager/) | Docker container management sidebar | |
+| [docker-manager](docker-manager/) | Docker and Podman container management sidebar | |
 | [go-test-runner](go-test-runner/) | Run and view Go test results | |
 | [http-client](http-client/) | HTTP request client | |
 | [json-viewer](json-viewer/) | JSON tree viewer for the current file | |

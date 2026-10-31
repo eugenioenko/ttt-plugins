@@ -1,8 +1,8 @@
 {
   "name": "docker-manager",
   "displayName": "Docker Manager",
-  "description": "Manage Docker containers, images and volumes",
-  "version": "0.1.0",
+  "description": "Manage Docker or Podman containers, images and volumes",
+  "version": "0.2.0",
   "author": "eugenioenko",
   "entry": "init.lua",
   "api": 1,
@@ -10,6 +10,8 @@
     "panel.sidebar": true,
     "commands": true,
     "keybindings": true,
-    "system.exec": ["docker"]
+    "settings": true,
+    "settings_keys": ["docker.runtime"],
+    "system.exec": ["docker", "podman"]
   }
 }

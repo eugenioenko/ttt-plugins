@@ -1,5 +1,6 @@
 local ttt = require("ttt")
 local sys = require("ttt.system")
+local settings = require("ttt.settings")
 
 -- State
 local containers = {}
@@ -8,7 +9,21 @@ local volumes = {}
 local loading = true
 local initialized = false
 
--- Parse docker output
+-- Container runtime
+local RUNTIME_KEY = "docker.runtime"
+
+local function runtime()
+	if settings.get(RUNTIME_KEY) == "podman" then
+		return "podman"
+	end
+	return "docker"
+end
+
+local function exec(args, callback)
+	sys.exec_async(runtime(), args, callback)
+end
+
+-- Parse runtime output
 local function parse_lines(stdout)
 	local items = {}
 	for line in stdout:gmatch("[^\n]+") do
@@ -20,8 +35,7 @@ local function parse_lines(stdout)
 end
 
 local function refresh_containers(panel)
-	sys.exec_async(
-		"docker",
+	exec(
 		{ "ps", "-a", "--format", "{{.Names}}\t{{.Status}}\t{{.Image}}\t{{.ID}}" },
 		function(result)
 			containers = {}
@@ -48,7 +62,7 @@ local function refresh_containers(panel)
 end
 
 local function refresh_images(panel)
-	sys.exec_async("docker", { "images", "--format", "{{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.ID}}" }, function(result)
+	exec({ "images", "--format", "{{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.ID}}" }, function(result)
 		images = {}
 		if result.exit_code == 0 then
 			for _, line in ipairs(parse_lines(result.stdout)) do
@@ -69,7 +83,7 @@ local function refresh_images(panel)
 end
 
 local function refresh_volumes(panel)
-	sys.exec_async("docker", { "volume", "ls", "--format", "{{.Name}}\t{{.Driver}}" }, function(result)
+	exec({ "volume", "ls", "--format", "{{.Name}}\t{{.Driver}}" }, function(result)
 		volumes = {}
 		if result.exit_code == 0 then
 			for _, line in ipairs(parse_lines(result.stdout)) do
@@ -98,7 +112,7 @@ end
 -- Container actions
 local function container_action(action, name, panel)
 	ttt.log("info", action .. " container: " .. name)
-	sys.exec_async("docker", { action, name }, function(result)
+	exec({ action, name }, function(result)
 		if result.exit_code == 0 then
 			ttt.log("info", action .. " " .. name .. ": ok")
 		else
@@ -130,7 +144,7 @@ end
 local function container_remove(name, panel)
 	ttt.confirm("Remove container '" .. name .. "'?", function()
 		ttt.log("info", "removing container: " .. name)
-		sys.exec_async("docker", { "rm", "-f", name }, function(result)
+		exec({ "rm", "-f", name }, function(result)
 			if result.exit_code == 0 then
 				ttt.log("info", "removed " .. name)
 			else
@@ -145,7 +159,7 @@ end
 local function image_remove(id, panel)
 	ttt.confirm("Remove image '" .. id .. "'?", function()
 		ttt.log("info", "removing image: " .. id)
-		sys.exec_async("docker", { "rmi", id }, function(result)
+		exec({ "rmi", id }, function(result)
 			if result.exit_code == 0 then
 				ttt.log("info", "removed image " .. id)
 			else
@@ -160,7 +174,7 @@ end
 local function volume_remove(name, panel)
 	ttt.confirm("Remove volume '" .. name .. "'?", function()
 		ttt.log("info", "removing volume: " .. name)
-		sys.exec_async("docker", { "volume", "rm", name }, function(result)
+		exec({ "volume", "rm", name }, function(result)
 			if result.exit_code == 0 then
 				ttt.log("info", "removed volume " .. name)
 			else
@@ -234,10 +248,20 @@ local function cmd_refresh()
 	refresh_all(last_panel)
 end
 
+local function cmd_switch_runtime()
+	local next_runtime = runtime() == "docker" and "podman" or "docker"
+	settings.set(RUNTIME_KEY, next_runtime)
+	ttt.log("info", "container runtime: " .. next_runtime)
+	refresh_all(last_panel)
+	if last_panel then
+		last_panel:redraw()
+	end
+end
+
 local function cmd_prune_containers()
 	ttt.confirm("Prune all stopped containers?", function()
 		ttt.log("info", "pruning stopped containers...")
-		sys.exec_async("docker", { "container", "prune", "-f" }, function(result)
+		exec({ "container", "prune", "-f" }, function(result)
 			if result.exit_code == 0 then
 				ttt.log("info", "container prune: ok")
 			else
@@ -251,7 +275,7 @@ end
 local function cmd_prune_images()
 	ttt.confirm("Prune all unused images?", function()
 		ttt.log("info", "pruning unused images...")
-		sys.exec_async("docker", { "image", "prune", "-f" }, function(result)
+		exec({ "image", "prune", "-f" }, function(result)
 			if result.exit_code == 0 then
 				ttt.log("info", "image prune: ok")
 			else
@@ -265,7 +289,7 @@ end
 local function cmd_prune_volumes()
 	ttt.confirm("Prune all unused volumes?", function()
 		ttt.log("info", "pruning unused volumes...")
-		sys.exec_async("docker", { "volume", "prune", "-f" }, function(result)
+		exec({ "volume", "prune", "-f" }, function(result)
 			if result.exit_code == 0 then
 				ttt.log("info", "volume prune: ok")
 			else
@@ -287,6 +311,8 @@ ttt.register({
 			{ label = "Prune Images", command = "docker.sidebarAction.pruneImages" },
 			{ label = "Prune Volumes", command = "docker.sidebarAction.pruneVolumes" },
 			{ separator = true },
+			{ label = "Switch Docker / Podman", command = "docker.sidebarAction.switchRuntime" },
+			{ separator = true },
 			{ label = "Help", command = "docker.sidebarAction.help" },
 		},
 		on_action = function(command)
@@ -298,6 +324,8 @@ ttt.register({
 				cmd_prune_images()
 			elseif command == "docker.sidebarAction.pruneVolumes" then
 				cmd_prune_volumes()
+			elseif command == "docker.sidebarAction.switchRuntime" then
+				cmd_switch_runtime()
 			elseif command == "docker.sidebarAction.help" then
 				ttt.show_info("Docker Shortcuts", {
 					{ key = "Enter / Space", value = "Toggle start / stop container" },
@@ -321,6 +349,8 @@ ttt.register({
 				panel:label({ text = "Loading...", style = "muted" })
 				return
 			end
+
+			panel:label({ text = "Runtime: " .. runtime(), style = "muted", padding_left = 1, padding_right = 1 })
 
 			-- Containers section
 			panel:vstack({
@@ -426,9 +456,14 @@ ttt.register({
 		{ id = "docker.pruneContainers", title = "Docker: Prune Containers", handler = cmd_prune_containers },
 		{ id = "docker.pruneImages", title = "Docker: Prune Images", handler = cmd_prune_images },
 		{ id = "docker.pruneVolumes", title = "Docker: Prune Volumes", handler = cmd_prune_volumes },
+		{ id = "docker.switchRuntime", title = "Docker: Switch Runtime (Docker / Podman)", handler = cmd_switch_runtime },
 	},
 
 	keybindings = {
 		{ key = "ctrl+k r", command = "docker.refresh" },
 	},
 })
+
+ttt.on_uninstall(function()
+	settings.set(RUNTIME_KEY, nil)
+end)
