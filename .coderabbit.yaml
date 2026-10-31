@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+tone_instructions: >-
+  Focus on actionable correctness, permission, lifecycle, and UX issues.
+  Verify plugin API claims against the ttt docs and implementation.
+  Avoid cosmetic comments and duplicate test requirements.
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  collapse_walkthrough: true
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "**/*.lua"
+      instructions: >-
+        Apply AGENT.md's plugin implementation and verification rules.
+        Before reporting an API or lifecycle issue, verify it against the
+        documentation for the relevant host version; inspect the linked host
+        implementation when behavior remains unclear.
+        Prioritize host-wiring timing, repeated external work during rendering,
+        stale async results, missing redraws, stable item IDs, focus, and
+        Unicode/display-width handling. Check loading, empty, and error states
+        when affected. Request focused verification of changed behavior,
+        not a new per-plugin test framework.
+
+    - path: "**/plugin.ttt.json"
+      instructions: >-
+        Validate against the host's plugin-authoring reference.
+        Preserve the plugin name unless a migration is intended; check that
+        it matches its directory. Check the supported API version and that
+        entry, grammar, and theme paths exist within the plugin.
+        Match permissions to actual API use, including system.exec,
+        settings_keys, and documented filesystem and network scopes.
+        Flag missing or unnecessary permissions, personal paths, and secrets.
+        Grammar-only and theme-only plugins may omit the Lua entry point.
+
+    - path: "**/README.md"
+      instructions: >-
+        Check documented commands, keybindings, settings defaults, dependencies,
+        permissions, and installation or reload steps against the adjacent
+        manifest and implementation.
+        For the root README, check the plugin index when plugins are added
+        or renamed. Use the maintained documentation linked in AGENT.md;
+        do not link to the removed docs/PLUGINS.md.
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "AGENT.md"
+  linked_repositories:
+    - repository: eugenioenko/ttt
+      instructions: >-
+        Contains the editor and plugin host. Use the documentation linked in
+        AGENT.md for the relevant host version; inspect the host implementation
+        when behavior remains unclear.
+
+chat:
+  auto_reply: true
