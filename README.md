@@ -105,4 +105,4 @@ Each plugin lives in its own subdirectory with a `plugin.ttt.json` manifest.
 
 ## Creating a Plugin
 
-See the [Plugin Documentation](https://github.com/eugenioenko/ttt/blob/main/docs/PLUGINS.md) for the full API reference.
+See the [Plugin Authoring Guide](https://github.com/eugenioenko/ttt/blob/main/docs-web/src/content/docs/guides/plugin-authoring.md) for the full API reference and [Testing Plugins](https://github.com/eugenioenko/ttt/blob/main/docs-web/src/content/docs/guides/plugin-testing.md) for the headless test harness. Agents working in this repository should read [AGENT.md](AGENT.md).
