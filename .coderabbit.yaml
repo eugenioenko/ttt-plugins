@@ -20,35 +20,35 @@ reviews:
   path_instructions:
     - path: "**/*.lua"
       instructions: >-
-        These are sandboxed Lua 5.1 plugins hosted by ttt, not standalone Lua
-        applications. Read AGENT.md and the linked ttt plugin documentation
-        before suggesting API changes. Check callback arguments, registration,
-        initialization versus host-wiring timing, and documented lifecycle hooks.
-        Prefer asynchronous external work; flag repeated process launches from
-        render callbacks, stale async results after selection or query changes,
-        and state changes that fail to redraw the panel. Check stable item IDs,
-        focus, keyboard and mouse behavior, narrow panels, and loading, empty,
-        and error states. Keep colors in named styles and settings access within
-        the manifest scope. Do not recommend unavailable standard Lua libraries,
-        shell APIs, or invented ttt functions. Require focused verification of
-        changed behavior rather than a new test framework for every plugin.
+        Apply AGENT.md's plugin implementation and verification rules.
+        Before reporting an API or lifecycle issue, verify it against the
+        documentation for the relevant host version; inspect the linked host
+        implementation when behavior remains unclear.
+        Prioritize host-wiring timing, repeated external work during rendering,
+        stale async results, missing redraws, stable item IDs, focus, and
+        Unicode/display-width handling. Check loading, empty, and error states
+        when affected. Request focused verification of changed behavior,
+        not a new per-plugin test framework.
+
     - path: "**/plugin.ttt.json"
       instructions: >-
-        Verify the manifest against the ttt plugin-authoring reference. Keep the
-        plugin name stable and consistent with its directory, check that entry,
-        grammar, and theme paths exist within the plugin, and check the supported
-        API version. Match permissions to actual Lua calls: external binaries
-        need system.exec entries, settings need settings_keys, and filesystem
-        and network access must use the documented scopes. Flag unnecessary
-        permission expansion, missing permissions, personal paths, or secrets.
-        Grammar-only and theme-only plugins can omit the Lua entry point.
+        Validate against the host's plugin-authoring reference.
+        Preserve the plugin name unless a migration is intended; check that
+        it matches its directory. Check the supported API version and that
+        entry, grammar, and theme paths exist within the plugin.
+        Match permissions to actual API use, including system.exec,
+        settings_keys, and documented filesystem and network scopes.
+        Flag missing or unnecessary permissions, personal paths, and secrets.
+        Grammar-only and theme-only plugins may omit the Lua entry point.
+
     - path: "**/README.md"
       instructions: >-
-        Check commands, keybindings, settings defaults, external dependencies,
-        permissions, and install or reload instructions against the adjacent
-        manifest and Lua source. The root README is the plugin directory index.
-        Use the current ttt plugin-authoring, plugin-testing, and plugins guides
-        linked in AGENT.md; do not introduce links to the removed docs/PLUGINS.md.
+        Check documented commands, keybindings, settings defaults, dependencies,
+        permissions, and installation or reload steps against the adjacent
+        manifest and implementation.
+        For the root README, check the plugin index when plugins are added
+        or renamed. Use the maintained documentation linked in AGENT.md;
+        do not link to the removed docs/PLUGINS.md.
 
 knowledge_base:
   code_guidelines:
@@ -58,14 +58,9 @@ knowledge_base:
   linked_repositories:
     - repository: eugenioenko/ttt
       instructions: >-
-        This repository implements the editor and the Lua plugin host. The API
-        source of truth is docs-web/src/content/docs/guides/plugin-authoring.md;
-        plugin-testing.md in the same directory describes --plugin, --exec,
-        --listen, screenshots, debug dumps, and isolated TTT_CONFIG_DIR usage.
-        plugins.md describes installation, permissions, and lifecycle. Consult
-        internal/plugin for bindings, manifests, sandboxing, and widget builders;
-        internal/widgets for shared controls; and internal/app/commands_plugin.go
-        for host wiring when documentation leaves an API behavior unclear.
+        Contains the editor and plugin host. Use the documentation linked in
+        AGENT.md for the relevant host version; inspect the host implementation
+        when behavior remains unclear.
 
 chat:
   auto_reply: true
