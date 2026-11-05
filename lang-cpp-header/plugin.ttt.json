@@ -1,0 +1,17 @@
+{
+  "name": "lang-cpp-header",
+  "displayName": "C/C++ Header Syntax Highlighting",
+  "description": "Syntax highlighting for .h header files using ttt's built-in C++ grammar",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "api": 1,
+  "grammars": [
+    {
+      "path": "syntaxes/cpp-header.tmLanguage.json",
+      "language": "C++ Header",
+      "fileTypes": [
+        "h"
+      ]
+    }
+  ]
+}
