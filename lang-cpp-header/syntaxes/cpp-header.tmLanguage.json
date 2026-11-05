@@ -1,0 +1,5 @@
+{
+  "scopeName": "source.cpp-header",
+  "name": "C++ Header",
+  "patterns": [{ "include": "source.cpp" }]
+}
