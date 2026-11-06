@@ -329,6 +329,7 @@ end
 ttt.register({
 	sidebar = {
 		title = "Docker",
+		icon = { plain = "⧈", nerd = "\239\146\183" },
 		actions = {
 			{ label = "Refresh All", command = "docker.sidebarAction.refresh" },
 			{ separator = true },

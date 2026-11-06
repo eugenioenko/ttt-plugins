@@ -312,6 +312,7 @@ end
 ttt.register({
   sidebar = {
     title = "PR Review",
+		icon = { plain = "⑂", nerd = "\238\169\164" },
     render = function(p)
       sidebar = p
       p:hstack({height = 1, gap = 1, render = function(row)

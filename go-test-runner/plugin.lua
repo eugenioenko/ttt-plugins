@@ -428,7 +428,7 @@ end
 ttt.register({
 	sidebar = {
 		title = "Tests",
-
+		icon = { plain = "▶", nerd = "\238\176\172" },
 		actions = {
 			{ label = "Run All Tests", command = "gotest.action.runAll" },
 			{ label = "Refresh Test List", command = "gotest.action.refresh" },
