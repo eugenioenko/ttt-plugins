@@ -153,6 +153,7 @@ end
 ttt.register({
 	sidebar = {
 		title = "Cheat Sheet",
+		icon = { plain = "?", nerd = "\238\170\164" },
 		render = function(panel)
 			last_panel = panel
 

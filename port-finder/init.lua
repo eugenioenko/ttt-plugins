@@ -131,6 +131,7 @@ end
 ttt.register({
   sidebar = {
     title = "Ports",
+    icon = { plain = "⇄", nerd = "\238\172\173" },
     actions = {
       { label = "Refresh", command = "refresh" },
     },
