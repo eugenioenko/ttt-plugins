@@ -2,7 +2,6 @@
 import argparse
 import concurrent.futures
 import fcntl
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -45,10 +44,6 @@ def write_json(path, value):
     os.replace(temporary, path)
 
 
-def source_hash(text):
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()
-
-
 def check_translation(key, source, translated):
     if not isinstance(translated, str) or not translated.strip():
         raise ValueError(f"{key}: translation is empty or is not a string")
@@ -64,7 +59,7 @@ def plugin_name(locale):
 
 def paths(root, locale):
     directory = root / plugin_name(locale)
-    return directory, directory / "messages.json", directory / "source-hashes.json"
+    return directory, directory / "messages.json"
 
 
 def target_version(root):
@@ -91,7 +86,35 @@ def load_locales(root):
     return locales
 
 
-def manifest(locale, version="dev"):
+def source_commit(root):
+    file = root / "i18n" / "source" / "upstream.json"
+    commit = json.loads(file.read_text(encoding="utf-8"))["commit"]
+    if not isinstance(commit, str) or not re.fullmatch(r"[0-9a-f]{40}", commit):
+        raise ValueError("Upstream commit must be a full Git commit ID")
+    return commit
+
+
+def load_ignored_keys(root, locales, source, extra=(), selected=None):
+    file = root / "i18n" / "ignored-keys.json"
+    rules = json.loads(file.read_text(encoding="utf-8"), object_pairs_hook=unique_object) if file.exists() else {}
+    codes = {locale["locale"] for locale in locales}
+    if not isinstance(rules, dict) or set(rules) - codes:
+        raise ValueError("Ignore rules must map configured locales to key lists")
+    result = {code: set() for code in codes}
+    for code, keys in rules.items():
+        if not isinstance(keys, list) or any(not isinstance(key, str) for key in keys):
+            raise ValueError(f"{code}: ignored keys must be a list of strings")
+        result[code].update(keys)
+    for code in selected if selected is not None else codes:
+        result[code].update(extra)
+    for code, keys in result.items():
+        if keys - source.keys():
+            raise ValueError(f"{code}: unknown ignored keys: {sorted(keys - source.keys())}")
+    return result
+
+
+def manifest(locale, version="dev", commit=""):
+
     return {
         "name": plugin_name(locale["locale"]),
         "displayName": locale["name"] + " Language Pack",
@@ -100,23 +123,33 @@ def manifest(locale, version="dev"):
         "author": "eugenioenko",
         "languages": [{
             "locale": locale["locale"], "name": locale["name"],
-            "path": "messages.json", "sourceHashes": "source-hashes.json", "tttVersion": version,
+            "path": "messages.json", "sourceCommit": commit, "tttVersion": version,
         }],
     }
 
 
 def update_manifest(root, locale):
-    directory, _, _ = paths(root, locale["locale"])
+    directory, _ = paths(root, locale["locale"])
     file = directory / "plugin.ttt.json"
-    expected = manifest(locale, target_version(root))
+    expected = manifest(locale, target_version(root), source_commit(root))
     actual = json.loads(file.read_text(encoding="utf-8")) if file.exists() else expected.copy()
     actual["languages"] = expected["languages"]
     write_json(file, actual)
 
 
-def pending_keys(source, translations, hashes):
-    return [key for key in sorted(source)
-            if key not in translations or hashes.get(key) != source_hash(source[key])]
+def pending_keys(source, translations, previous, ignored=()):
+    return [key for key in sorted(source) if key not in ignored
+            and (key not in translations or previous.get(key) != source[key])]
+
+
+def translation_context(source, messages, pending, offset, batch, limit=60):
+    def words(text):
+        return set(re.findall(r"[a-z]{3,}", text.lower()))
+    terms = set().union(*(words(value) for value in batch.values()))
+    excluded = set(pending[offset:])
+    candidates = [key for key in messages if key in source and key not in excluded]
+    candidates.sort(key=lambda key: (-len(words(source[key]) & terms), key))
+    return {key: messages[key] for key in candidates[:limit]}
 
 
 def codex_translate(batch, locale, context, executable="codex", model=None, timeout=600):
@@ -159,25 +192,25 @@ read files, or modify anything. Return only the requested JSON translations.
         return read_messages(output_file)
 
 
-def update_locale(root, locale, source, translate, batch_size=200):
-    directory, messages_file, hashes_file = paths(root, locale["locale"])
+def update_locale(root, locale, source, previous, translate, batch_size=200, ignored=()):
+    _, messages_file = paths(root, locale["locale"])
     messages = read_messages(messages_file, optional=True)
-    hashes = read_messages(hashes_file, optional=True)
-    pending = pending_keys(source, messages, hashes)
+    pending = pending_keys(source, messages, previous, ignored)
+    missing_ignored = set(ignored) - messages.keys()
+    if missing_ignored:
+        raise ValueError(f"{locale['locale']}: ignored keys need existing translations: {sorted(missing_ignored)}")
     for key in source.keys() & messages.keys():
         if key not in pending:
             check_translation(key, source[key], messages[key])
-    if not pending and not (messages.keys() - source.keys()) and not (hashes.keys() - source.keys()):
+    if not pending and not (messages.keys() - source.keys()):
         update_manifest(root, locale)
         print(f"{locale['locale']}: up to date; no LLM call", flush=True)
         return 0
     messages = {k: v for k, v in messages.items() if k in source}
-    hashes = {k: v for k, v in hashes.items() if k in source}
     for offset in range(0, len(pending), batch_size):
         keys = pending[offset:offset + batch_size]
         batch = {key: source[key] for key in keys}
-        context_keys = [k for k in sorted(messages) if k.startswith("general.")][:60]
-        context = {key: messages[key] for key in context_keys if key not in batch}
+        context = translation_context(source, messages, pending, offset, batch)
         failure = None
         for attempt in range(3):
             try:
@@ -194,27 +227,35 @@ def update_locale(root, locale, source, translate, batch_size=200):
         if failure:
             raise failure
         messages.update(translated)
-        hashes.update({key: source_hash(source[key]) for key in keys})
         write_json(messages_file, messages)
-        write_json(hashes_file, hashes)
         print(f"{locale['locale']}: translated {min(offset + batch_size, len(pending))}/{len(pending)} changed/new keys", flush=True)
     write_json(messages_file, messages)
-    write_json(hashes_file, hashes)
     update_manifest(root, locale)
     return len(pending)
 
 
+def generate(root, locales, all_locales, source, translate, batch_size=200, jobs=1, ignored=None):
+    snapshot = root / "i18n" / "source" / "snapshot.json"
+    previous = read_messages(snapshot, optional=True)
+    rules = ignored or {}
+    def run(locale):
+        return update_locale(root, locale, source, previous, translate, batch_size, rules.get(locale["locale"], ()))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as pool:
+        list(pool.map(run, locales))
+    validate(root, locales, source)
+    if {item["locale"] for item in locales} == {item["locale"] for item in all_locales}:
+        write_json(snapshot, source)
+
+
 def validate(root, locales, source):
     for locale in locales:
-        _, messages_file, hashes_file = paths(root, locale["locale"])
-        messages, hashes = read_messages(messages_file), read_messages(hashes_file)
-        if set(messages) != set(source) or set(hashes) != set(source):
+        _, messages_file = paths(root, locale["locale"])
+        messages = read_messages(messages_file)
+        if set(messages) != set(source):
             raise ValueError(f"{locale['locale']}: missing or obsolete keys")
         for key, original in source.items():
-            if hashes[key] != source_hash(original):
-                raise ValueError(f"{locale['locale']}: stale source hash for {key}")
             check_translation(key, original, messages[key])
-        expected = manifest(locale, target_version(root))
+        expected = manifest(locale, target_version(root), source_commit(root))
         actual = json.loads((messages_file.parent / "plugin.ttt.json").read_text(encoding="utf-8"))
         if actual.get("name") != expected["name"] or actual.get("languages") != expected["languages"]:
             raise ValueError(f"{locale['locale']}: invalid language pack manifest")
@@ -240,6 +281,7 @@ def main():
     parser = argparse.ArgumentParser(description="Incremental TTT code-editor localization through the installed Codex CLI")
     parser.add_argument("action", choices=["sync", "plan", "generate", "validate", "registry"])
     parser.add_argument("--locale", action="append", help="Locale to process; repeat to select several (default: all)")
+    parser.add_argument("--ignore-keys", action="append", default=[], help="Comma-separated keys to preserve for selected locales; repeatable")
     parser.add_argument("--ref", default="main", help="Upstream commit/ref for sync")
     parser.add_argument("--ttt-version", help="Target release for sync; release refs infer it, other refs default to dev")
     parser.add_argument("--batch-size", type=int, default=200)
@@ -249,7 +291,8 @@ def main():
     args = parser.parse_args()
     if args.batch_size < 1 or args.jobs < 1:
         parser.error("--batch-size and --jobs must be positive")
-    locales = load_locales(ROOT)
+    all_locales = load_locales(ROOT)
+    locales = all_locales
     if args.locale:
         selected = set(args.locale)
         unknown = selected - {item["locale"] for item in locales}
@@ -265,26 +308,25 @@ def main():
             sync_source(ROOT, args.ref, args.ttt_version)
             return
         source = read_messages(ROOT / "i18n" / "source" / "en.json")
+        extra = [key.strip() for group in args.ignore_keys for key in group.split(",") if key.strip()]
+        ignored = load_ignored_keys(ROOT, all_locales, source, extra, {item["locale"] for item in locales})
         if args.action == "plan":
+            previous = read_messages(ROOT / "i18n" / "source" / "snapshot.json", optional=True)
             for locale in locales:
-                _, messages_file, hashes_file = paths(ROOT, locale["locale"])
-                pending = pending_keys(source, read_messages(messages_file, True), read_messages(hashes_file, True))
+                _, messages_file = paths(ROOT, locale["locale"])
+                pending = pending_keys(source, read_messages(messages_file, True), previous, ignored[locale["locale"]])
                 print(f"{locale['locale']}: {len(pending)} added/changed keys")
         elif args.action == "generate":
-            def run(locale):
-                return update_locale(ROOT, locale, source,
-                    lambda batch, target, context: codex_translate(batch, target, context, args.codex, args.model),
-                    args.batch_size)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as pool:
-                list(pool.map(run, locales))
-            validate(ROOT, locales, source)
+            generate(ROOT, locales, all_locales, source,
+                     lambda batch, target, context: codex_translate(batch, target, context, args.codex, args.model),
+                     args.batch_size, args.jobs, ignored)
         elif args.action == "validate":
             validate(ROOT, locales, source)
         else:
             validate(ROOT, locales, source)
             registry = []
             for locale in locales:
-                directory, _, _ = paths(ROOT, locale["locale"])
+                directory, _ = paths(ROOT, locale["locale"])
                 pack = json.loads((directory / "plugin.ttt.json").read_text(encoding="utf-8"))
                 registry.append({k: pack[k] for k in ["name", "displayName", "description", "version", "author"]} | {
                     "repo": "https://github.com/eugenioenko/ttt-plugins", "path": plugin_name(locale["locale"]),

@@ -7,7 +7,7 @@
       "locale": "ar",
       "name": "العربية",
       "path": "messages.json",
-      "sourceHashes": "source-hashes.json",
+      "sourceCommit": "e2c249393ab523cea4a5229640cd0c8ba641e13c",
       "tttVersion": "dev"
     }
   ],

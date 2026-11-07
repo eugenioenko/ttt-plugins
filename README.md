@@ -56,7 +56,7 @@ Theme plugins contribute color themes without Lua or filesystem permissions. Req
 
 ## Display languages
 
-Language packs translate the core interface. Requires [TTT language pack support](https://github.com/eugenioenko/ttt/pull/1385). Install a pack, choose **Change Display Language**, and restart. All language plugin names and folders use the `ttt-i18n-` prefix. Generate translations with `make languages` and validate them with `make languages-check`; see [incremental generation and maintenance](i18n/README.md).
+Language packs translate the core interface. Requires TTT 1.12.0 or later. Install a pack, choose **Change Display Language**, and restart. All language plugin names and folders use the `ttt-i18n-` prefix. Generate translations with `make languages` and validate them with `make languages-check`; see [incremental generation and maintenance](i18n/README.md).
 
 | Plugin | Language |
 |--------|----------|

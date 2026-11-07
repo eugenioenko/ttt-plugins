@@ -7,8 +7,12 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - run: make languages-check
       - run: |
           python3 i18n/scripts/translate.py registry
