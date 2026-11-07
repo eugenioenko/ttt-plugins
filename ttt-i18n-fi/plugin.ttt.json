@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Finnish",
+  "displayName": "Suomi Language Pack",
+  "languages": [
+    {
+      "locale": "fi",
+      "name": "Suomi",
+      "path": "messages.json",
+      "sourceCommit": "e2c249393ab523cea4a5229640cd0c8ba641e13c",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-fi",
+  "version": "0.1.0"
+}

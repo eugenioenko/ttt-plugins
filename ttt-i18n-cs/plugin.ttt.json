@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Czech",
+  "displayName": "Čeština Language Pack",
+  "languages": [
+    {
+      "locale": "cs",
+      "name": "Čeština",
+      "path": "messages.json",
+      "sourceCommit": "e2c249393ab523cea4a5229640cd0c8ba641e13c",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-cs",
+  "version": "0.1.0"
+}

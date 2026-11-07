@@ -1,0 +1,19 @@
+name: Validate language packs
+on:
+  push:
+    paths: ["i18n/**", "ttt-i18n-*/**", "Makefile", ".github/workflows/i18n.yml"]
+  pull_request:
+    paths: ["i18n/**", "ttt-i18n-*/**", "Makefile", ".github/workflows/i18n.yml"]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: make languages-check
+      - run: |
+          python3 i18n/scripts/translate.py registry
+          git diff --exit-code -- i18n/community-plugins.json

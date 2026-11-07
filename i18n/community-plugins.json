@@ -1,0 +1,422 @@
+[
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Arabic",
+    "displayName": "العربية Language Pack",
+    "name": "ttt-i18n-ar",
+    "path": "ttt-i18n-ar",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "ar"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Bengali",
+    "displayName": "বাংলা Language Pack",
+    "name": "ttt-i18n-bn",
+    "path": "ttt-i18n-bn",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "bn"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Czech",
+    "displayName": "Čeština Language Pack",
+    "name": "ttt-i18n-cs",
+    "path": "ttt-i18n-cs",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "cs"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Danish",
+    "displayName": "Dansk Language Pack",
+    "name": "ttt-i18n-da",
+    "path": "ttt-i18n-da",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "da"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in German",
+    "displayName": "Deutsch Language Pack",
+    "name": "ttt-i18n-de",
+    "path": "ttt-i18n-de",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "de"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Greek",
+    "displayName": "Ελληνικά Language Pack",
+    "name": "ttt-i18n-el",
+    "path": "ttt-i18n-el",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "el"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Spanish",
+    "displayName": "Español Language Pack",
+    "name": "ttt-i18n-es",
+    "path": "ttt-i18n-es",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "es"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Persian",
+    "displayName": "فارسی Language Pack",
+    "name": "ttt-i18n-fa",
+    "path": "ttt-i18n-fa",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "fa"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Finnish",
+    "displayName": "Suomi Language Pack",
+    "name": "ttt-i18n-fi",
+    "path": "ttt-i18n-fi",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "fi"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in French",
+    "displayName": "Français Language Pack",
+    "name": "ttt-i18n-fr",
+    "path": "ttt-i18n-fr",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "fr"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Hebrew",
+    "displayName": "עברית Language Pack",
+    "name": "ttt-i18n-he",
+    "path": "ttt-i18n-he",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "he"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Hindi",
+    "displayName": "हिन्दी Language Pack",
+    "name": "ttt-i18n-hi",
+    "path": "ttt-i18n-hi",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "hi"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Hungarian",
+    "displayName": "Magyar Language Pack",
+    "name": "ttt-i18n-hu",
+    "path": "ttt-i18n-hu",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "hu"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Indonesian",
+    "displayName": "Bahasa Indonesia Language Pack",
+    "name": "ttt-i18n-id",
+    "path": "ttt-i18n-id",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "id"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Italian",
+    "displayName": "Italiano Language Pack",
+    "name": "ttt-i18n-it",
+    "path": "ttt-i18n-it",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "it"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Japanese",
+    "displayName": "日本語 Language Pack",
+    "name": "ttt-i18n-ja",
+    "path": "ttt-i18n-ja",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "ja"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Korean",
+    "displayName": "한국어 Language Pack",
+    "name": "ttt-i18n-ko",
+    "path": "ttt-i18n-ko",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "ko"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Norwegian Bokmål",
+    "displayName": "Norsk bokmål Language Pack",
+    "name": "ttt-i18n-nb",
+    "path": "ttt-i18n-nb",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "nb"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Dutch",
+    "displayName": "Nederlands Language Pack",
+    "name": "ttt-i18n-nl",
+    "path": "ttt-i18n-nl",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "nl"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Polish",
+    "displayName": "Polski Language Pack",
+    "name": "ttt-i18n-pl",
+    "path": "ttt-i18n-pl",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "pl"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Brazilian Portuguese",
+    "displayName": "Português (Brasil) Language Pack",
+    "name": "ttt-i18n-pt-br",
+    "path": "ttt-i18n-pt-br",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "pt-BR"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Romanian",
+    "displayName": "Română Language Pack",
+    "name": "ttt-i18n-ro",
+    "path": "ttt-i18n-ro",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "ro"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Russian",
+    "displayName": "Русский Language Pack",
+    "name": "ttt-i18n-ru",
+    "path": "ttt-i18n-ru",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "ru"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Swedish",
+    "displayName": "Svenska Language Pack",
+    "name": "ttt-i18n-sv",
+    "path": "ttt-i18n-sv",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "sv"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Thai",
+    "displayName": "ไทย Language Pack",
+    "name": "ttt-i18n-th",
+    "path": "ttt-i18n-th",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "th"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Turkish",
+    "displayName": "Türkçe Language Pack",
+    "name": "ttt-i18n-tr",
+    "path": "ttt-i18n-tr",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "tr"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Ukrainian",
+    "displayName": "Українська Language Pack",
+    "name": "ttt-i18n-uk",
+    "path": "ttt-i18n-uk",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "uk"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Vietnamese",
+    "displayName": "Tiếng Việt Language Pack",
+    "name": "ttt-i18n-vi",
+    "path": "ttt-i18n-vi",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "vi"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Simplified Chinese (mainland China)",
+    "displayName": "简体中文 Language Pack",
+    "name": "ttt-i18n-zh-cn",
+    "path": "ttt-i18n-zh-cn",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "zh-CN"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
+    "description": "TTT code editor interface in Traditional Chinese (Taiwan)",
+    "displayName": "繁體中文 Language Pack",
+    "name": "ttt-i18n-zh-tw",
+    "path": "ttt-i18n-zh-tw",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "zh-TW"
+    ],
+    "version": "0.1.0"
+  }
+]

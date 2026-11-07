@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Hindi",
+  "displayName": "हिन्दी Language Pack",
+  "languages": [
+    {
+      "locale": "hi",
+      "name": "हिन्दी",
+      "path": "messages.json",
+      "sourceCommit": "e2c249393ab523cea4a5229640cd0c8ba641e13c",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-hi",
+  "version": "0.1.0"
+}

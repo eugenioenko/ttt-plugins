@@ -54,6 +54,43 @@ Theme plugins contribute color themes without Lua or filesystem permissions. Req
 |--------|-------|
 | [theme-catppuccin-mocha](theme-catppuccin-mocha/) | Catppuccin Mocha |
 
+## Display languages
+
+Language packs translate the core interface. Requires TTT 1.12.0 or later. Install a pack, choose **Change Display Language**, and restart. All language plugin names and folders use the `ttt-i18n-` prefix. Generate translations with `make languages` and validate them with `make languages-check`; see [incremental generation and maintenance](i18n/README.md).
+
+| Plugin | Language |
+|--------|----------|
+| [ttt-i18n-ar](ttt-i18n-ar/) | Arabic — العربية |
+| [ttt-i18n-bn](ttt-i18n-bn/) | Bengali — বাংলা |
+| [ttt-i18n-cs](ttt-i18n-cs/) | Czech — Čeština |
+| [ttt-i18n-da](ttt-i18n-da/) | Danish — Dansk |
+| [ttt-i18n-de](ttt-i18n-de/) | German — Deutsch |
+| [ttt-i18n-el](ttt-i18n-el/) | Greek — Ελληνικά |
+| [ttt-i18n-es](ttt-i18n-es/) | Spanish — Español |
+| [ttt-i18n-fa](ttt-i18n-fa/) | Persian — فارسی |
+| [ttt-i18n-fi](ttt-i18n-fi/) | Finnish — Suomi |
+| [ttt-i18n-fr](ttt-i18n-fr/) | French — Français |
+| [ttt-i18n-he](ttt-i18n-he/) | Hebrew — עברית |
+| [ttt-i18n-hi](ttt-i18n-hi/) | Hindi — हिन्दी |
+| [ttt-i18n-hu](ttt-i18n-hu/) | Hungarian — Magyar |
+| [ttt-i18n-id](ttt-i18n-id/) | Indonesian — Bahasa Indonesia |
+| [ttt-i18n-it](ttt-i18n-it/) | Italian — Italiano |
+| [ttt-i18n-ja](ttt-i18n-ja/) | Japanese — 日本語 |
+| [ttt-i18n-ko](ttt-i18n-ko/) | Korean — 한국어 |
+| [ttt-i18n-nb](ttt-i18n-nb/) | Norwegian Bokmål — Norsk bokmål |
+| [ttt-i18n-nl](ttt-i18n-nl/) | Dutch — Nederlands |
+| [ttt-i18n-pl](ttt-i18n-pl/) | Polish — Polski |
+| [ttt-i18n-pt-br](ttt-i18n-pt-br/) | Brazilian Portuguese — Português (Brasil) |
+| [ttt-i18n-ro](ttt-i18n-ro/) | Romanian — Română |
+| [ttt-i18n-ru](ttt-i18n-ru/) | Russian — Русский |
+| [ttt-i18n-sv](ttt-i18n-sv/) | Swedish — Svenska |
+| [ttt-i18n-th](ttt-i18n-th/) | Thai — ไทย |
+| [ttt-i18n-tr](ttt-i18n-tr/) | Turkish — Türkçe |
+| [ttt-i18n-uk](ttt-i18n-uk/) | Ukrainian — Українська |
+| [ttt-i18n-vi](ttt-i18n-vi/) | Vietnamese — Tiếng Việt |
+| [ttt-i18n-zh-cn](ttt-i18n-zh-cn/) | Simplified Chinese (mainland China) — 简体中文 |
+| [ttt-i18n-zh-tw](ttt-i18n-zh-tw/) | Traditional Chinese (Taiwan) — 繁體中文 |
+
 ## LSP Servers
 
 LSP plugins auto-configure language servers via the `lsp.servers` setting. Install the plugin and server binary to enable supported LSP features; see each plugin's README for capabilities and limitations.

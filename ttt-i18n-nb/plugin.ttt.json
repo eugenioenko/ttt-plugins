@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Norwegian Bokmål",
+  "displayName": "Norsk bokmål Language Pack",
+  "languages": [
+    {
+      "locale": "nb",
+      "name": "Norsk bokmål",
+      "path": "messages.json",
+      "sourceCommit": "e2c249393ab523cea4a5229640cd0c8ba641e13c",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-nb",
+  "version": "0.1.0"
+}

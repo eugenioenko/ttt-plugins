@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Simplified Chinese (mainland China)",
+  "displayName": "简体中文 Language Pack",
+  "languages": [
+    {
+      "locale": "zh-CN",
+      "name": "简体中文",
+      "path": "messages.json",
+      "sourceCommit": "e2c249393ab523cea4a5229640cd0c8ba641e13c",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-zh-cn",
+  "version": "0.1.0"
+}
