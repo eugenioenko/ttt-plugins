@@ -329,7 +329,7 @@
   "explorer.openFolder": "폴더 열기…",
   "files.cannotOpen": "{path}을(를) 열 수 없음: {message}",
   "files.cannotOpenSpecialFile": "{path}을(를) 열 수 없음: 일반 파일이 아님",
-  "files.delete": "{name}을(를) 삭제하시겠습니까?",
+  "files.delete": "{name} 삭제할까요?",
   "files.filePath": "파일 경로",
   "files.folderPath": "폴더 경로",
   "files.kilobytes": "{size} KB",

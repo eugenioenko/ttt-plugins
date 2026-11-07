@@ -567,7 +567,7 @@
   "menu.installFromURL": "ติดตั้งจาก URL",
   "menu.keybindings": "ปุ่มลัด",
   "menu.lSPCodeAssist": "ตัวช่วยเขียนโค้ด LSP",
-  "menu.lSPHover": "ข้อมูลเมื่อชี้เมาส์จาก LSP",
+  "menu.lSPHover": "ข้อมูลโฮเวอร์ LSP",
   "menu.lineNumbers": "หมายเลขบรรทัด",
   "menu.list": "รายการ",
   "menu.menuBar": "แถบเมนู",

@@ -512,7 +512,7 @@
   "lsp.plainText": "プレーンテキスト",
   "lsp.running": "実行中",
   "lsp.starting": "起動中",
-  "menu.about": "このアプリについて",
+  "menu.about": "TTTについて",
   "menu.addCursorAbove": "上にカーソルを追加",
   "menu.addCursorBelow": "下にカーソルを追加",
   "menu.addNextOccurrence": "次の一致箇所を選択に追加",
