@@ -220,6 +220,7 @@ ttt.set_timeout(0, apply)
 ttt.register({
 	sidebar = {
 		title = "Bookmarks",
+		icon = { plain = "★", nerd = "\238\170\165" },
 		actions = {
 			{ label = "Remove All Bookmarks", command = "bookmarks.sidebarAction.removeAll" },
 		},

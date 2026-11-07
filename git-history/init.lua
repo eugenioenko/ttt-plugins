@@ -177,6 +177,7 @@ end)
 ttt.register({
   sidebar = {
     title = "History",
+		icon = { plain = "⟳", nerd = "\238\170\130" },
     actions = {
       { label = "Refresh", command = "refresh" },
     },
