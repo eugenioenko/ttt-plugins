@@ -20,15 +20,15 @@ python3 i18n/scripts/translate.py sync --ref v1.12.0
 python3 i18n/scripts/translate.py plan
 
 # Generate every language using the local Codex CLI.
-python3 i18n/scripts/translate.py generate --jobs 3
+make languages I18N_ARGS='--jobs 3'
 
 # Or select languages and an executable explicitly.
-python3 i18n/scripts/translate.py generate --locale es --locale ja --codex /path/to/codex
+make languages I18N_ARGS='--locale es --locale ja --codex /path/to/codex'
 
-python3 i18n/scripts/translate.py validate
-python3 i18n/scripts/translate.py registry
-python3 -m unittest discover -s i18n/tests
+make languages-check
 ```
+
+`make languages` generates all locales and refreshes `i18n/community-plugins.json`. `I18N_ARGS` passes options to generation; selected-locale runs still require every pack to validate before exporting the full registry. `make languages-check` runs the unit tests and validates all packs without calling an LLM. `PYTHON` can select another Python executable. Plain `make` defaults to validation.
 
 Use a release tag that exists in the TTT repository. `sync --ref main` prepares unreleased translations with `tttVersion: "dev"`; the release updater ignores those until a compatible release target is published. `--ttt-version X.Y.Z` explicitly sets the target when syncing another ref. `i18n/source/upstream.json` records the source commit and target TTT version. Publishing a new target with unchanged English text updates manifest metadata without translation calls.
 
