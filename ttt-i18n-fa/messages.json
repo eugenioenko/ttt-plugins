@@ -611,7 +611,7 @@
   "menu.unpinTab": "برداشتن سنجاق زبانه",
   "menu.unstage": "لغو آماده‌سازی",
   "menu.view": "نمایش",
-  "menu.wordWrap": "شکستن خطوط در مرز واژه‌ها",
+  "menu.wordWrap": "شکست سطر در مرز واژه",
   "menu.wrapLines": "شکستن خطوط",
   "menubar.hiddenPaletteHint": "نوار منو پنهان است: برای نمایش آن، «نمایش: تغییر وضعیت نوار منو» را از پالت فرمان اجرا کنید",
   "menubar.hiddenShortcutHint": "نوار منو پنهان است: برای نمایش آن {shortcut} را فشار دهید",

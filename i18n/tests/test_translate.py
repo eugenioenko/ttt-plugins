@@ -1,12 +1,16 @@
+import contextlib
+import io
 import json
 from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from translate import (check_translation, generate, load_ignored_keys, load_locales,
-                       pending_keys, read_messages, translation_context, write_json)
+from translate import (audit_lengths, check_translation, codex_translate, copy_width, generate,
+                       length_outliers, length_review_limit, load_ignored_keys, load_locales,
+                       pending_keys, read_messages, translation_context, validate, write_json)
 
 
 class TranslationTests(unittest.TestCase):
@@ -163,6 +167,72 @@ class TranslationTests(unittest.TestCase):
             write_json(self.root / "i18n/languages.json", locales)
             with self.assertRaises(ValueError):
                 load_locales(self.root)
+
+    def test_length_review_requires_both_relative_and_absolute_expansion(self):
+        source = {"short": "Save", "long": "x" * 20}
+        # Even 4x expansion of a tiny label, or +20 on a longer line, is not extreme.
+        self.assertEqual(length_outliers(source, {"short": "x" * 16, "long": "x" * 40}), [])
+        self.assertEqual(length_outliers(source, {"short": "x" * 17, "long": "x" * 51}),
+                         [("long", 20, 51, 50), ("short", 4, 17, 16)])
+        self.assertEqual(length_review_limit("LSP Hover"), 22)
+
+    def test_width_uses_widest_literal_line_and_terminal_columns(self):
+        self.assertEqual(copy_width("Save {veryLongFilename}\n文件"), 5)
+        self.assertEqual(copy_width("文件"), 4)
+        self.assertEqual(copy_width("é"), 1)
+        self.assertEqual(copy_width("e\u0301"), 2)  # TTT advances for each code point.
+        self.assertEqual(copy_width(""), 0)
+        source = {"a": "Save {veryLongFilename}"}
+        self.assertEqual(length_outliers(source, {"a": "x" * 18 + " {veryLongFilename}"}),
+                         [("a", 5, 19, 17)])
+
+    def test_length_audit_is_advisory_and_does_not_rewrite_manual_copy(self):
+        source = {"general.save": "Save"}
+        self.run_generation(source)
+        write_json(self.messages_file(), {"general.save": "Reviewed long translation that must stay"})
+        before = self.messages_file().read_bytes()
+        self.calls.clear()
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(audit_lengths(self.root, self.locales, source), 1)
+            self.run_generation(source)
+        self.assertIn("es general.save: 4 → 40 columns", output.getvalue())
+        self.assertEqual(self.calls, [])
+        self.assertEqual(self.messages_file().read_bytes(), before)
+        self.assertEqual(read_messages(self.snapshot), source)
+
+    def test_codex_receives_length_guidance_alongside_code_editor_context(self):
+        batch = {"menu.lSPHover": "LSP Hover", "general.save": "Save {filename}"}
+
+        def run(command, **options):
+            prompt = options["input"]
+            self.assertIn("terminal CODE EDITOR", prompt)
+            self.assertIn("Git staging/commits/branches/diffs", prompt)
+            self.assertIn("action, scope, negation, and essential warnings", prompt)
+            payload = json.loads(prompt[prompt.index('{"target":'):])
+            self.assertEqual(payload["length_review_columns"], {"menu.lSPHover": 22, "general.save": 17})
+            self.assertEqual(payload["messages_to_translate"], batch)
+            output = Path(command[command.index("--output-last-message") + 1])
+            write_json(output, {"menu.lSPHover": "Ayuda LSP", "general.save": "Guardar {filename}"})
+            return type("Result", (), {"returncode": 0})()
+
+        with patch("translate.subprocess.run", side_effect=run):
+            result = codex_translate(batch, self.locale, {})
+        self.assertEqual(result["general.save"], "Guardar {filename}")
+
+    def test_long_error_details_pass_validation_and_remain_unchanged(self):
+        source = {"files.openFailed": "Could not open {path}: {error}"}
+        self.run_generation(source)
+        detailed = "No se pudo abrir {path}: {error}. " + "Información necesaria para resolver el problema. " * 8
+        write_json(self.messages_file(), {"files.openFailed": detailed})
+        before = self.messages_file().read_bytes()
+        self.calls.clear()
+        with contextlib.redirect_stdout(io.StringIO()):
+            validate(self.root, self.locales, source)
+            self.assertEqual(audit_lengths(self.root, self.locales, source), 1)
+            self.run_generation(source)
+        self.assertEqual(self.messages_file().read_bytes(), before)
+        self.assertEqual(self.calls, [])
 
 
 if __name__ == "__main__":

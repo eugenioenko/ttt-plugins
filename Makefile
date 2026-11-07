@@ -6,6 +6,7 @@ I18N_ARGS ?=
 languages-check:
 	$(PYTHON) -m unittest discover -s i18n/tests
 	$(PYTHON) i18n/scripts/translate.py validate
+	$(PYTHON) i18n/scripts/translate.py audit-length
 
 languages:
 	$(PYTHON) i18n/scripts/translate.py generate $(I18N_ARGS)
