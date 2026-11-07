@@ -16,6 +16,8 @@ Read the documentation for the host version being tested before changing API usa
 - Use host widgets, styles, and layout conventions; preserve keyboard, mouse, and Unicode behavior.
 - Keep the plugin README and manifest consistent with its behavior.
 
+- Language packs use matching `ttt-i18n-<locale-lowercase>` folders and manifest names. See [i18n/README.md](i18n/README.md) for the local Codex CLI generator. Translate only added or changed English keys and preserve unchanged translations, including manual corrections.
+
 ## Verification
 
 - Use the host's testing guide and isolated configuration. Choose the smallest deterministic check that proves the changed behavior.

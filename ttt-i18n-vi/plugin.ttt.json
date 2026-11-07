@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Vietnamese",
+  "displayName": "Tiếng Việt Language Pack",
+  "languages": [
+    {
+      "locale": "vi",
+      "name": "Tiếng Việt",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-vi",
+  "version": "0.1.0"
+}

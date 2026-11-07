@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Persian",
+  "displayName": "فارسی Language Pack",
+  "languages": [
+    {
+      "locale": "fa",
+      "name": "فارسی",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-fa",
+  "version": "0.1.0"
+}

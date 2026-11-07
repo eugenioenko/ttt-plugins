@@ -1,0 +1,152 @@
+[
+  {
+    "locale": "ar",
+    "name": "العربية",
+    "language": "Arabic"
+  },
+  {
+    "locale": "bn",
+    "name": "বাংলা",
+    "language": "Bengali"
+  },
+  {
+    "locale": "cs",
+    "name": "Čeština",
+    "language": "Czech"
+  },
+  {
+    "locale": "da",
+    "name": "Dansk",
+    "language": "Danish"
+  },
+  {
+    "locale": "de",
+    "name": "Deutsch",
+    "language": "German"
+  },
+  {
+    "locale": "el",
+    "name": "Ελληνικά",
+    "language": "Greek"
+  },
+  {
+    "locale": "es",
+    "name": "Español",
+    "language": "Spanish"
+  },
+  {
+    "locale": "fa",
+    "name": "فارسی",
+    "language": "Persian"
+  },
+  {
+    "locale": "fi",
+    "name": "Suomi",
+    "language": "Finnish"
+  },
+  {
+    "locale": "fr",
+    "name": "Français",
+    "language": "French"
+  },
+  {
+    "locale": "he",
+    "name": "עברית",
+    "language": "Hebrew"
+  },
+  {
+    "locale": "hi",
+    "name": "हिन्दी",
+    "language": "Hindi"
+  },
+  {
+    "locale": "hu",
+    "name": "Magyar",
+    "language": "Hungarian"
+  },
+  {
+    "locale": "id",
+    "name": "Bahasa Indonesia",
+    "language": "Indonesian"
+  },
+  {
+    "locale": "it",
+    "name": "Italiano",
+    "language": "Italian"
+  },
+  {
+    "locale": "ja",
+    "name": "日本語",
+    "language": "Japanese"
+  },
+  {
+    "locale": "ko",
+    "name": "한국어",
+    "language": "Korean"
+  },
+  {
+    "locale": "nb",
+    "name": "Norsk bokmål",
+    "language": "Norwegian Bokmål"
+  },
+  {
+    "locale": "nl",
+    "name": "Nederlands",
+    "language": "Dutch"
+  },
+  {
+    "locale": "pl",
+    "name": "Polski",
+    "language": "Polish"
+  },
+  {
+    "locale": "pt-BR",
+    "name": "Português (Brasil)",
+    "language": "Brazilian Portuguese"
+  },
+  {
+    "locale": "ro",
+    "name": "Română",
+    "language": "Romanian"
+  },
+  {
+    "locale": "ru",
+    "name": "Русский",
+    "language": "Russian"
+  },
+  {
+    "locale": "sv",
+    "name": "Svenska",
+    "language": "Swedish"
+  },
+  {
+    "locale": "th",
+    "name": "ไทย",
+    "language": "Thai"
+  },
+  {
+    "locale": "tr",
+    "name": "Türkçe",
+    "language": "Turkish"
+  },
+  {
+    "locale": "uk",
+    "name": "Українська",
+    "language": "Ukrainian"
+  },
+  {
+    "locale": "vi",
+    "name": "Tiếng Việt",
+    "language": "Vietnamese"
+  },
+  {
+    "locale": "zh-CN",
+    "name": "简体中文",
+    "language": "Simplified Chinese (mainland China)"
+  },
+  {
+    "locale": "zh-TW",
+    "name": "繁體中文",
+    "language": "Traditional Chinese (Taiwan)"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Indonesian",
+  "displayName": "Bahasa Indonesia Language Pack",
+  "languages": [
+    {
+      "locale": "id",
+      "name": "Bahasa Indonesia",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-id",
+  "version": "0.1.0"
+}

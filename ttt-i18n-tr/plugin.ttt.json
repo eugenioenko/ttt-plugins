@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Turkish",
+  "displayName": "Türkçe Language Pack",
+  "languages": [
+    {
+      "locale": "tr",
+      "name": "Türkçe",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-tr",
+  "version": "0.1.0"
+}

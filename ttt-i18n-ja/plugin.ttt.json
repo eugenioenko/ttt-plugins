@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Japanese",
+  "displayName": "日本語 Language Pack",
+  "languages": [
+    {
+      "locale": "ja",
+      "name": "日本語",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-ja",
+  "version": "0.1.0"
+}

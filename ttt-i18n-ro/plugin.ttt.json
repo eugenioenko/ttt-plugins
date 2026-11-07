@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Romanian",
+  "displayName": "Română Language Pack",
+  "languages": [
+    {
+      "locale": "ro",
+      "name": "Română",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-ro",
+  "version": "0.1.0"
+}

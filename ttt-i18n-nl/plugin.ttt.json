@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Dutch",
+  "displayName": "Nederlands Language Pack",
+  "languages": [
+    {
+      "locale": "nl",
+      "name": "Nederlands",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-nl",
+  "version": "0.1.0"
+}

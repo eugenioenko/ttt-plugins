@@ -39,7 +39,9 @@ reviews:
         Match permissions to actual API use, including system.exec,
         settings_keys, and documented filesystem and network scopes.
         Flag missing or unnecessary permissions, personal paths, and secrets.
-        Grammar-only and theme-only plugins may omit the Lua entry point.
+        Grammar-only, theme-only, and language-only plugins may omit the Lua entry
+        point. Language contributions target host PR eugenioenko/ttt#1385 until it
+        reaches the host default branch.
 
     - path: "**/README.md"
       instructions: >-

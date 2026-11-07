@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Korean",
+  "displayName": "한국어 Language Pack",
+  "languages": [
+    {
+      "locale": "ko",
+      "name": "한국어",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-ko",
+  "version": "0.1.0"
+}

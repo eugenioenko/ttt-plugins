@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Italian",
+  "displayName": "Italiano Language Pack",
+  "languages": [
+    {
+      "locale": "it",
+      "name": "Italiano",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-it",
+  "version": "0.1.0"
+}

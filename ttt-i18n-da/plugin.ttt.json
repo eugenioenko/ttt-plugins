@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Danish",
+  "displayName": "Dansk Language Pack",
+  "languages": [
+    {
+      "locale": "da",
+      "name": "Dansk",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-da",
+  "version": "0.1.0"
+}

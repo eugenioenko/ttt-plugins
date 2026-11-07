@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Hebrew",
+  "displayName": "עברית Language Pack",
+  "languages": [
+    {
+      "locale": "he",
+      "name": "עברית",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-he",
+  "version": "0.1.0"
+}

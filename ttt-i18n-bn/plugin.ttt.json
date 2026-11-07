@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Bengali",
+  "displayName": "বাংলা Language Pack",
+  "languages": [
+    {
+      "locale": "bn",
+      "name": "বাংলা",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-bn",
+  "version": "0.1.0"
+}

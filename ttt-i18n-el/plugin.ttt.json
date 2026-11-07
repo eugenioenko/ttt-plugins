@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Greek",
+  "displayName": "Ελληνικά Language Pack",
+  "languages": [
+    {
+      "locale": "el",
+      "name": "Ελληνικά",
+      "path": "messages.json",
+      "sourceHashes": "source-hashes.json",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-el",
+  "version": "0.1.0"
+}
