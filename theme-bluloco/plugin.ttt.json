@@ -1,0 +1,19 @@
+{
+  "name": "theme-bluloco",
+  "displayName": "Bluloco Theme",
+  "description": "Bluloco dark and light color themes for ttt, plus a light variant with a dark terminal",
+  "version": "0.1.0",
+  "author": "Uloco",
+  "api": 2,
+  "themes": [
+    {
+      "path": "themes/bluloco-dark.json"
+    },
+    {
+      "path": "themes/bluloco-light.json"
+    },
+    {
+      "path": "themes/bluloco-light-dark-terminal.json"
+    }
+  ]
+}
