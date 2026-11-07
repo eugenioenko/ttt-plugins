@@ -52,6 +52,7 @@ Theme plugins contribute color themes without Lua or filesystem permissions. Req
 
 | Plugin | Theme |
 |--------|-------|
+| [theme-bluloco](theme-bluloco/) | Bluloco Dark, Bluloco Light, Bluloco Light with dark terminal |
 | [theme-catppuccin-mocha](theme-catppuccin-mocha/) | Catppuccin Mocha |
 
 ## Display languages
