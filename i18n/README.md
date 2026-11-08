@@ -42,7 +42,22 @@ make languages-check
 
 For a release, replace the example commit with a published TTT tag that includes `internal/i18n/en.json`. Releases predating the English catalog cannot be used for sync. `sync --ref main` prepares unreleased translations with `tttVersion: "dev"`; the release updater ignores those until a compatible release target is published. `--ttt-version X.Y.Z` explicitly sets the target when syncing another ref. `i18n/source/upstream.json` records the source commit and target TTT version. Publishing a new target with unchanged English text updates manifest metadata without translation calls.
 
-The prompt identifies TTT as a **code editor**, with developer terminology for Git staging, branches, diffs, LSP diagnostics, code folding, commands, and settings. It requests concise UI text, preserves named placeholders and technical identifiers, and supplies existing common translations for consistency. Codex runs with a read-only sandbox in a temporary directory and returns JSON matching an exact-key schema. `--model` optionally overrides the locally configured model. `--batch-size` controls request size; `--jobs` controls concurrent locales.
+The prompt identifies TTT as a **code editor**, with developer terminology for Git staging, branches, diffs, LSP diagnostics, code folding, commands, and settings. It requests compact UI text close to the English width, supplies per-key length review bounds and existing translations for consistency, and preserves named placeholders and technical identifiers. Long literal translations should be rephrased with familiar developer terms instead of expanding acronyms or explaining short labels. Settings labels should aim to fit 30 terminal columns where meaning permits. Action, scope, negation, and essential warnings take priority over brevity. Codex runs with a read-only sandbox in a temporary directory and returns JSON matching an exact-key schema. `--model` optionally overrides the locally configured model. `--batch-size` controls request size; `--jobs` controls concurrent locales.
+
+### Review long translations
+
+Generation and `make languages-check` (including CI) print an advisory length audit. Run it separately for all packs or selected locales:
+
+```sh
+python3 i18n/scripts/translate.py audit-length
+python3 i18n/scripts/translate.py audit-length --locale it --locale es
+```
+
+The audit lists the locale, key, English and translated text, widths, and review bound. It flags copy only when its widest literal line exceeds **both 2.5× the English width and 12 extra columns** (the ratio bound is rounded down). Named placeholders are excluded from both widths so long variable names cannot hide expanded copy. Wide/fullwidth characters count as two columns; other code points, including combining marks, count as one to approximate TTT's rune-based grid. This is a conservative review heuristic; terminal width settings and actual substituted values can change the rendered width. It does not guarantee that every unflagged label fits.
+
+Normal expansion is expected. Review candidates in context, shorten extreme cases manually in the relevant `messages.json`, and check related menu/command/settings labels for consistent terminology. Prefer concise natural phrases and established developer terms; remove redundant explanations before considering familiar abbreviations. Never mechanically truncate words, remove placeholders, or sacrifice action, scope, negation, or essential warning information. Inspect affected screens with the [host test harness](https://github.com/eugenioenko/ttt/blob/main/docs-web/src/content/docs/guides/plugin-testing.md) and an isolated `TTT_CONFIG_DIR`.
+
+Length findings do not fail tests or validation, trigger retries, or cause unchanged keys to be regenerated. Error messages and explanatory text can stay long when the detail is useful. A necessary long translation can remain after review. The audit itself never changes catalogs. Manual corrections stay intact while English is unchanged, just like other translation improvements.
 
 ## Incremental behavior
 
