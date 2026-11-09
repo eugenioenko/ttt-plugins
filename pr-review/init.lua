@@ -10,6 +10,7 @@ local state = {
   prs = {},
   saved = {},
   pr_state = "open",
+  comment_tabs = {},
   loading = false,
   error = "",
   list_generation = 0,
@@ -293,6 +294,8 @@ end
 local function open_comments()
   local pr = state.current
   if not pr then ttt.notify("Open a pull request first"); return end
+  local tab_id = "comments:" .. pr.repo .. "#" .. pr.number
+  if state.comment_tabs[tab_id] then ttt.open_tab({id = tab_id, title = "", render = function() end}); return end
   local comments = {entries = {}, pending = 3, errors = {}, expand_all = false}
   local function sort_entries()
     table.sort(comments.entries, function(a, b) return a.time < b.time end)
@@ -328,12 +331,13 @@ local function open_comments()
     end)
   end
 
-  ttt.open_drawer({side = "left", width = 85, min_width = 30, render = function(p)
+  state.comment_tabs[tab_id] = true
+  ttt.open_tab({id = tab_id, title = "Comments · PR #" .. pr.number,
+    on_close = function() state.comment_tabs[tab_id] = nil end, render = function(p)
     p:hstack({height = 1, gap = 1, padding_right = 1, render = function(row)
       row:label({text = "Comments · PR #" .. pr.number, style = "bold", padding_left = 1})
       row:button({label = comments.expand_all and "Collapse all" or "Expand all", padding_left = 2, padding_right = 2,
         on_click = function() comments.expand_all = not comments.expand_all end})
-      row:button({label = "Close", padding_left = 2, padding_right = 2, on_click = ttt.close_drawer})
     end})
     p:divider()
     if comments.pending > 0 then p:label({text = "Loading comments…", style = "muted", padding_left = 1}) end
