@@ -85,6 +85,7 @@ Language packs translate the core interface. Requires TTT 1.12.0 or later. Insta
 | [ttt-i18n-pt-br](ttt-i18n-pt-br/) | Brazilian Portuguese — Português (Brasil) |
 | [ttt-i18n-ro](ttt-i18n-ro/) | Romanian — Română |
 | [ttt-i18n-ru](ttt-i18n-ru/) | Russian — Русский |
+| [ttt-i18n-sl](ttt-i18n-sl/) | Slovenian — Slovenščina |
 | [ttt-i18n-sv](ttt-i18n-sv/) | Swedish — Svenska |
 | [ttt-i18n-th](ttt-i18n-th/) | Thai — ไทย |
 | [ttt-i18n-tr](ttt-i18n-tr/) | Turkish — Türkçe |

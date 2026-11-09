@@ -2,7 +2,7 @@
 
 Interface translations for the [TTT terminal code editor](https://github.com/eugenioenko/ttt), generated locally with the installed [Codex CLI](https://developers.openai.com/codex/cli/). These are machine-generated translations; corrections from native speakers are welcome.
 
-The initial collection covers Arabic, Bengali, Czech, Danish, German, Greek, Spanish, Persian, Finnish, French, Hebrew, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Norwegian Bokmål, Dutch, Polish, Brazilian Portuguese, Romanian, Russian, Swedish, Thai, Turkish, Ukrainian, Vietnamese, Simplified Chinese, and Traditional Chinese. English ships with TTT. Terminal support for bidirectional text and shaping affects Arabic, Hebrew, and Persian display.
+The collection covers Arabic, Bengali, Czech, Danish, German, Greek, Spanish, Persian, Finnish, French, Hebrew, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Norwegian Bokmål, Dutch, Polish, Brazilian Portuguese, Romanian, Russian, Slovenian, Swedish, Thai, Turkish, Ukrainian, Vietnamese, Simplified Chinese, and Traditional Chinese. English ships with TTT. Terminal support for bidirectional text and shaping affects Arabic, Hebrew, and Persian display.
 
 After this pack PR merges and the corresponding entries reach the [host main registry](https://github.com/eugenioenko/ttt/blob/main/community-plugins.json), install a pack from TTT's Plugins panel, choose **Change Display Language** (or **Settings → General → Display language**), and restart. Packs require TTT 1.12.0 or later. The editor caches them for offline use. Its default-on **Update languages on upgrade** setting checks for a compatible catalog when a newer TTT version starts.
 

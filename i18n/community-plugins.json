@@ -323,6 +323,20 @@
   },
   {
     "author": "eugenioenko",
+    "description": "TTT code editor interface in Slovenian",
+    "displayName": "Slovenščina Language Pack",
+    "name": "ttt-i18n-sl",
+    "path": "ttt-i18n-sl",
+    "repo": "https://github.com/eugenioenko/ttt-plugins",
+    "tags": [
+      "language-pack",
+      "i18n",
+      "sl"
+    ],
+    "version": "0.1.0"
+  },
+  {
+    "author": "eugenioenko",
     "description": "TTT code editor interface in Swedish",
     "displayName": "Svenska Language Pack",
     "name": "ttt-i18n-sv",
