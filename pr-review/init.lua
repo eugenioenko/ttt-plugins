@@ -229,59 +229,191 @@ local function submit_review(draft, event)
   end)
 end
 
+local THREADS_QUERY = [[
+query($owner: String!, $name: String!, $number: Int!, $endCursor: String) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      reviewThreads(first: 50, after: $endCursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          id isResolved path line originalLine viewerCanResolve viewerCanReply
+          comments(first: 50) { nodes { author { login } body createdAt } }
+        }
+      }
+    }
+  }
+}]]
+local RESOLVE_MUTATION = "mutation($id: ID!) { resolveReviewThread(input: {threadId: $id}) { thread { isResolved } } }"
+local REPLY_MUTATION = "mutation($id: ID!, $body: String!) { addPullRequestReviewThreadReply(" ..
+    "input: {pullRequestReviewThreadId: $id, body: $body}) { comment { id } } }"
+local TAG_WIDTH = 8
+
+local function summary_text(body)
+  local text = body:gsub("<!%-%-.-%-%->", ""):gsub("<[^>]*>", " ")
+  for line in text:gmatch("[^\r\n]+") do
+    line = line:gsub("^[%s#>*%-]+", ""):gsub("[<>`*]", ""):gsub("%s+", " "):gsub("%s+$", "")
+    if line ~= "" then return line end
+  end
+  return ""
+end
+
+-- ttt's markdown matches a </details> inside a quote as the end of the
+-- enclosing disclosure, so quoted disclosure tags would end ours early.
+local function strip_quoted_disclosures(body)
+  return (("\n" .. body):gsub("\n(%s*>[^\n]*)", function(line)
+    return "\n" .. line:gsub("</?details[^>]*>", ""):gsub("</?summary[^>]*>", "")
+  end):sub(2))
+end
+
+local function comment_block(author, time, body)
+  return "**@" .. author .. "** · " .. (time or "") .. "\n\n" .. strip_quoted_disclosures(body)
+end
+
+local function entry_markdown(entry, open)
+  local tag = entry.tag .. string.rep(" ", TAG_WIDTH - ttt_text.width(entry.tag))
+  local summary = ttt_text.truncate(tag .. "  " .. entry.summary, 72, "…")
+  return "<details" .. (open and " open" or "") .. ">\n<summary>" .. summary ..
+      "</summary>\n\n" .. entry.body .. "\n</details>"
+end
+
+local function thread_entry(t)
+  local nodes = t.comments and t.comments.nodes or {}
+  local first = nodes[1] or {}
+  local parts = {}
+  for _, c in ipairs(nodes) do
+    parts[#parts + 1] = comment_block(c.author and c.author.login or "ghost", c.createdAt, c.body or "")
+  end
+  local where = (t.path or "?") .. ":" .. tostring(t.line or t.originalLine or "?")
+  local author = first.author and first.author.login or "ghost"
+  return {thread = t, time = first.createdAt or "", tag = t.isResolved and "Resolved" or "Open",
+    summary = where .. " · @" .. author .. ": " .. summary_text(first.body or ""),
+    body = table.concat(parts, "\n\n---\n\n")}
+end
+
 local function open_comments()
   local pr = state.current
   if not pr then ttt.notify("Open a pull request first"); return end
-  local comments = {items = {}, pending = 3, errors = {}}
+  local comments = {entries = {}, pending = 3, errors = {}, expand_all = false}
+  local function sort_entries()
+    table.sort(comments.entries, function(a, b) return a.time < b.time end)
+  end
+  local function thread_action(entry, args, done)
+    local t = entry.thread
+    t.busy = true
+    gh(args, nil, function(_, err)
+      t.busy = false
+      if err then
+        comments.errors[#comments.errors + 1] = tostring(err)
+        ttt.notify(tostring(err), "error")
+        return
+      end
+      done()
+    end)
+  end
+  local function resolve(entry)
+    thread_action(entry, {"api", "graphql", "-f", "query=" .. RESOLVE_MUTATION, "-f", "id=" .. entry.thread.id}, function()
+      entry.thread.isResolved = true
+      entry.tag = "Resolved"
+    end)
+  end
+  local function send_reply(entry)
+    local body = entry.reply or ""
+    if not body:match("%S") then ttt.notify("Write a reply first"); return end
+    thread_action(entry, {"api", "graphql", "-f", "query=" .. REPLY_MUTATION, "-f", "id=" .. entry.thread.id,
+        "-f", "body=" .. body}, function()
+      local nodes = entry.thread.comments.nodes
+      nodes[#nodes + 1] = {author = {login = "you"}, body = body, createdAt = "just now"}
+      local updated = thread_entry(entry.thread)
+      entry.body, entry.replying, entry.reply = updated.body, false, nil
+    end)
+  end
+
   ttt.open_drawer({side = "left", width = 85, min_width = 30, render = function(p)
     p:hstack({height = 1, gap = 1, padding_right = 1, render = function(row)
       row:label({text = "Comments · PR #" .. pr.number, style = "bold", padding_left = 1})
+      row:button({label = comments.expand_all and "Collapse all" or "Expand all", padding_left = 2, padding_right = 2,
+        on_click = function() comments.expand_all = not comments.expand_all end})
       row:button({label = "Close", padding_left = 2, padding_right = 2, on_click = ttt.close_drawer})
     end})
     p:divider()
-    if comments.pending > 0 then p:label({text = "Loading comments…", style = "muted"}) end
+    if comments.pending > 0 then p:label({text = "Loading comments…", style = "muted", padding_left = 1}) end
     if #comments.errors > 0 then
-      p:label({text = table.concat(comments.errors, "\n"), style = "danger"})
+      p:label({text = table.concat(comments.errors, "\n"), style = "danger", padding_left = 1})
     end
-    local sections = {}
-    for _, item in ipairs(comments.items) do
-      local c = item.comment
-      local heading = "### @" .. (c.user and c.user.login or "ghost") .. " · " .. item.kind
-      if c.state then heading = heading .. " · " .. c.state end
-      local location = c.path and ("\n\n`" .. c.path .. ":" .. tostring(c.line or c.original_line or "?") .. "`") or ""
-      sections[#sections + 1] = heading .. "\n\n" .. (c.created_at or c.submitted_at or "") .. location .. "\n\n" .. c.body
+    if #comments.entries == 0 and comments.pending == 0 then
+      p:label({text = "No comments yet.", style = "muted", padding_left = 1})
     end
-    if #sections == 0 and comments.pending == 0 then sections[1] = "No comments yet." end
-    p:markdown({text = table.concat(sections, "\n\n---\n\n"),
-      padding_left = 1, padding_right = 1, full_width_dividers = true})
+    p:scrollview({render = function(list)
+      for _, entry in ipairs(comments.entries) do
+        local t = entry.thread
+        local open = comments.expand_all or (t ~= nil and not t.isResolved)
+        list:markdown({text = entry_markdown(entry, open), padding_left = 1, padding_right = 1})
+        if t and not t.isResolved then
+          if entry.replying then
+            list:box({border = true, padding_left = 1, padding_right = 1, margin_left = 1, margin_right = 1,
+              render = function(box)
+                box:input({placeholder = "Write a reply…", multiline = true, min_rows = 3, max_rows = 6,
+                  autofocus = true, value = entry.reply or "",
+                  on_change = function(text) entry.reply = text end})
+              end})
+          end
+          list:hstack({height = 1, gap = 1, padding_right = 1, render = function(row)
+            row:label(t.busy and {text = "Working…", style = "muted", padding_left = 1} or "")
+            if t.busy then return end
+            if entry.replying then
+              row:button({label = "Cancel", padding_left = 2, padding_right = 2,
+                on_click = function() entry.replying, entry.reply = false, nil end})
+              row:button({label = "Send", padding_left = 2, padding_right = 2, on_click = function() send_reply(entry) end})
+            else
+              if t.viewerCanReply then
+                row:button({label = "Reply", padding_left = 2, padding_right = 2,
+                  on_click = function() entry.replying = true end})
+              end
+              if t.viewerCanResolve then
+                row:button({label = "Resolve", padding_left = 2, padding_right = 2, on_click = function() resolve(entry) end})
+              end
+            end
+          end})
+        end
+        list:divider()
+      end
+    end})
   end})
+
   local base = "repos/" .. pr.repo
   for _, source in ipairs({
-    {path = base .. "/issues/" .. pr.number .. "/comments", kind = "Discussion"},
-    {path = base .. "/pulls/" .. pr.number .. "/comments", kind = "Inline"},
-    {path = base .. "/pulls/" .. pr.number .. "/reviews", kind = "Review"},
+    {path = base .. "/issues/" .. pr.number .. "/comments", time = "created_at"},
+    {path = base .. "/pulls/" .. pr.number .. "/reviews", time = "submitted_at"},
   }) do
-    local kind = source.kind
     gh({"api", "--paginate", source.path, "--jq", ".[] | @json"}, nil, function(text, err)
       comments.pending = comments.pending - 1
-      if err then
-        comments.errors[#comments.errors + 1] = kind .. ": " .. tostring(err)
-        return
-      end
+      if err then comments.errors[#comments.errors + 1] = tostring(err); return end
       for line in text:gmatch("[^\r\n]+") do
         local c, parse_err = decode(line)
         if not c then comments.errors[#comments.errors + 1] = parse_err; break end
         if type(c.body) == "string" and c.body:match("%S") then
-          comments.items[#comments.items + 1] = {comment = c, kind = kind}
+          local author = c.user and c.user.login or "ghost"
+          comments.entries[#comments.entries + 1] = {time = c[source.time] or "", tag = "Comment",
+            summary = "@" .. author .. ": " .. summary_text(c.body),
+            body = comment_block(author, c[source.time], c.body)}
         end
       end
-      table.sort(comments.items, function(a, b)
-        local at, bt = a.comment.created_at or a.comment.submitted_at or "", b.comment.created_at or b.comment.submitted_at or ""
-        if at ~= bt then return at < bt end
-        return tostring(a.comment.id) < tostring(b.comment.id)
-      end)
+      sort_entries()
     end)
   end
+  local owner, name = pr.repo:match("^([^/]+)/(.+)$")
+  gh({"api", "graphql", "--paginate", "-f", "query=" .. THREADS_QUERY, "-f", "owner=" .. owner, "-f", "name=" .. name,
+      "-F", "number=" .. pr.number, "--jq", ".data.repository.pullRequest.reviewThreads.nodes[] | @json"}, nil,
+      function(text, err)
+    comments.pending = comments.pending - 1
+    if err then comments.errors[#comments.errors + 1] = "Threads: " .. tostring(err); return end
+    for line in text:gmatch("[^\r\n]+") do
+      local t, parse_err = decode(line)
+      if not t then comments.errors[#comments.errors + 1] = parse_err; break end
+      comments.entries[#comments.entries + 1] = thread_entry(t)
+    end
+    sort_entries()
+  end)
 end
 
 local function open_review()
