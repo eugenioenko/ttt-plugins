@@ -22,7 +22,9 @@
         "Project.ede",
         "Cask",
         "Eask",
-        "Easkfile"
+        "Easkfile",
+        "elisp",
+        "emacs-lisp"
       ]
     }
   ]
