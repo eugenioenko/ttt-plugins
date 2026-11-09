@@ -23,26 +23,26 @@ Run the following commands from the `ttt-plugins` repository root. Plugin direct
 Requires Python 3.10+ on Linux/macOS, an installed `codex` executable, and an authenticated local Codex CLI. Generation uses your CLI configuration and saved login. Credentials are never stored here. CI only validates committed catalogs; it never calls an LLM.
 
 ```sh
-# Fetch the pinned unreleased English catalog used by the initial packs.
-python3 i18n/scripts/translate.py sync --ref e2c249393ab523cea4a5229640cd0c8ba641e13c
+# Fetch the latest English catalog from TTT main.
+make download
 
 # Inspect the number of added/changed keys per locale.
 python3 i18n/scripts/translate.py plan
 
-# Generate every language using the local Codex CLI.
-make languages I18N_ARGS='--jobs 3'
+# Generate every language using the local Codex CLI (5 concurrent jobs).
+make translate
 
 # Or select languages and an executable explicitly.
-make languages I18N_ARGS='--locale es --locale ja --codex /path/to/codex'
+make translate I18N_ARGS='--locale es --locale ja --codex /path/to/codex'
 
 make languages-check
 ```
 
-`make languages` generates all locales and refreshes `i18n/community-plugins.json`. `I18N_ARGS` passes options to generation; selected-locale runs still require every pack to validate before exporting the full registry. `make languages-check` runs the unit tests and validates all packs without calling an LLM. `PYTHON` can select another Python executable. Plain `make` defaults to validation.
+To download and translate without running the separate test/check target, run `make download && make translate`. `make download` fetches TTT `main` by default; `I18N_REF` selects another upstream ref. `make translate` generates all locales and refreshes `i18n/community-plugins.json`; `make languages` remains an alias. `I18N_ARGS` passes options to generation; selected-locale runs still require every pack to validate before exporting the full registry. `make languages-check` runs the unit tests and validates all packs without calling an LLM. `PYTHON` can select another Python executable. Plain `make` defaults to validation.
 
-For a release, replace the example commit with a published TTT tag that includes `internal/i18n/en.json`. Releases predating the English catalog cannot be used for sync. `sync --ref main` prepares unreleased translations with `tttVersion: "dev"`; the release updater ignores those until a compatible release target is published. `--ttt-version X.Y.Z` explicitly sets the target when syncing another ref. `i18n/source/upstream.json` records the source commit and target TTT version. Publishing a new target with unchanged English text updates manifest metadata without translation calls.
+For a release, use `make download I18N_REF=vX.Y.Z` with a published TTT tag that includes `internal/i18n/en.json`. Releases predating the English catalog cannot be used for sync. Downloading `main` prepares unreleased translations with `tttVersion: "dev"`; the release updater ignores those until a compatible release target is published. The script's `sync --ttt-version X.Y.Z` explicitly sets the target when syncing another ref. `i18n/source/upstream.json` records the source commit and target TTT version. Publishing a new target with unchanged English text updates manifest metadata without translation calls.
 
-The prompt identifies TTT as a **code editor**, with developer terminology for Git staging, branches, diffs, LSP diagnostics, code folding, commands, and settings. It requests compact UI text close to the English width, supplies per-key length review bounds and existing translations for consistency, and preserves named placeholders and technical identifiers. Long literal translations should be rephrased with familiar developer terms instead of expanding acronyms or explaining short labels. Settings labels should aim to fit 30 terminal columns where meaning permits. Action, scope, negation, and essential warnings take priority over brevity. Codex runs with a read-only sandbox in a temporary directory and returns JSON matching an exact-key schema. `--model` optionally overrides the locally configured model. `--batch-size` controls request size; `--jobs` controls concurrent locales.
+The prompt identifies TTT as a **code editor**, with developer terminology for Git staging, branches, diffs, LSP diagnostics, code folding, commands, and settings. It requests compact UI text close to the English width, supplies per-key length review bounds and existing translations for consistency, and preserves named placeholders and technical identifiers. Long literal translations should be rephrased with familiar developer terms instead of expanding acronyms or explaining short labels. Settings labels should aim to fit 30 terminal columns where meaning permits. Action, scope, negation, and essential warnings take priority over brevity. Codex runs with a read-only sandbox in a temporary directory and returns JSON matching an exact-key schema. `--model` optionally overrides the locally configured model. `--batch-size` controls request size; `--jobs` controls concurrent locales. `make translate` defaults to 5 jobs; override with, for example, `make translate I18N_ARGS='--jobs 3'`.
 
 ### Review long translations
 
@@ -70,7 +70,7 @@ After all configured languages finish and validate, generation advances the shar
 Skip keys for the selected locales with a one-off CLI option:
 
 ```sh
-make languages I18N_ARGS='--locale es --ignore-keys general.save,menu.file'
+make translate I18N_ARGS='--locale es --ignore-keys general.save,menu.file'
 ```
 
 `--ignore-keys` accepts comma-separated IDs and can be repeated. Without `--locale`, it applies to every configured language. Permanent exceptions live in `i18n/ignored-keys.json`:
