@@ -1,0 +1,16 @@
+{
+  "author": "eugenioenko",
+  "description": "TTT code editor interface in Slovenian",
+  "displayName": "Slovenščina Language Pack",
+  "languages": [
+    {
+      "locale": "sl",
+      "name": "Slovenščina",
+      "path": "messages.json",
+      "sourceCommit": "b51ae983e0f60599090e0b0061093dbece9b541f",
+      "tttVersion": "dev"
+    }
+  ],
+  "name": "ttt-i18n-sl",
+  "version": "0.1.0"
+}

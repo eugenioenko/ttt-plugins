@@ -115,6 +115,11 @@
     "language": "Russian"
   },
   {
+    "locale": "sl",
+    "name": "Slovenščina",
+    "language": "Slovenian"
+  },
+  {
     "locale": "sv",
     "name": "Svenska",
     "language": "Swedish"
