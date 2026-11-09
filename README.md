@@ -45,6 +45,7 @@ Grammar plugins add syntax highlighting for languages that ttt does not embed. I
 | [lang-git](lang-git/) | Git commit messages, rebase todo lists | `COMMIT_EDITMSG`, `git-rebase-todo` |
 | [lang-astro](lang-astro/) | Astro | `.astro` |
 | [lang-just](lang-just/) | Just | `justfile`, `.just` |
+| [lang-emacs-lisp](lang-emacs-lisp/) | Emacs Lisp | `.el`, `.emacs`, `Cask`, `Eask` |
 
 ## Themes
 

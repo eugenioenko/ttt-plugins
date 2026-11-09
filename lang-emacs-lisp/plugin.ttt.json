@@ -1,0 +1,29 @@
+{
+  "name": "lang-emacs-lisp",
+  "displayName": "Emacs Lisp Syntax Highlighting",
+  "description": "Syntax highlighting for Emacs Lisp files (.el, .emacs, Cask, Eask)",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "api": 1,
+  "grammars": [
+    {
+      "path": "syntaxes/emacs-lisp.tmLanguage.json",
+      "language": "Emacs Lisp",
+      "fileTypes": [
+        "el",
+        "eld",
+        "emacs",
+        "_emacs",
+        "spacemacs",
+        "abbrev_defs",
+        "gnus",
+        "viper",
+        "emacs.desktop",
+        "Project.ede",
+        "Cask",
+        "Eask",
+        "Easkfile"
+      ]
+    }
+  ]
+}
