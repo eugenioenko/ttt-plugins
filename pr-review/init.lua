@@ -2,13 +2,15 @@ local ttt = require("ttt")
 local sys = require("ttt.system")
 local json = require("ttt.json")
 local storage = require("ttt.storage")
+local ttt_text = require("ttt.text")
 
 local state = {
   url = "",
   repo = "",
   prs = {},
   saved = {},
-  status = "Enter a repository or PR URL, then Load",
+  pr_state = "open",
+  loading = false,
   error = "",
   list_generation = 0,
   open_generation = 0,
@@ -89,32 +91,44 @@ local function save_repository()
   redraw()
 end
 
-local function load_prs()
+local function load_prs(keep_current)
   if review and review.busy then return end
   local repo, number = repository(state.url)
   if not repo then
     fail("Enter a repository or pull request URL")
     return
   end
+  if keep_current then number = nil end
   state.list_generation = state.list_generation + 1
-  state.open_generation = state.open_generation + 1
   local generation = state.list_generation
-  state.repo, state.current, state.prs = repo, nil, {}
-  state.error, state.status = "", "Loading pull requests…"
-  local args = number and {"pr", "view", tostring(number), "--repo", repo,
-      "--json", "number,title,author,isDraft,url"} or
-      {"pr", "list", "--repo", repo, "--state", "open", "--limit", "100",
-      "--json", "number,title,author,isDraft,url"}
+  if not keep_current then
+    state.open_generation = state.open_generation + 1
+    state.current, state.opening = nil, number
+  end
+  state.repo, state.prs, state.single = repo, {}, number ~= nil
+  state.error, state.loading = "", true
+  local fields = "number,title,author,isDraft,state,url"
+  local args = number and {"pr", "view", tostring(number), "--repo", repo, "--json", fields} or
+      {"pr", "list", "--repo", repo, "--state", state.pr_state, "--limit", "100", "--json", fields}
   gh(args, nil, function(text, err)
     if generation ~= state.list_generation then return end
-    if err then state.status = "Load failed"; fail(err); return end
+    state.loading = false
+    if err then state.opening = nil; fail(err); return end
     local prs, parse_err = decode(text)
-    if not prs then fail(parse_err); return end
+    if not prs then state.opening = nil; fail(parse_err); return end
     state.prs = number and {prs} or prs
-    state.list_status = #state.prs .. (number and " PR · " or " open PRs · ") .. repo
-    state.status = state.list_status
     if number then open_pr(number) end
   end)
+end
+
+local function switch_pr_state(pr_state)
+  if state.pr_state == pr_state then return end
+  state.pr_state = pr_state
+  if state.repo ~= "" then
+    state.url = "https://github.com/" .. state.repo
+    load_prs(true)
+  end
+  redraw()
 end
 
 open_pr = function(number)
@@ -122,25 +136,29 @@ open_pr = function(number)
   if not ttt.open_changes then fail("Rebuild ttt with the draft open_changes API"); return end
   state.open_generation = state.open_generation + 1
   local generation, repo = state.open_generation, state.repo
-  state.current, state.error = nil, ""
-  state.status = "Opening PR #" .. number .. "…"
+  state.current, state.error, state.opening = nil, "", number
+  local function open_failed(message)
+    state.opening = nil
+    fail(message)
+  end
   gh({"api", "repos/" .. repo .. "/pulls/" .. number}, nil, function(text, err)
     if generation ~= state.open_generation then return end
-    if err then fail(err); return end
+    if err then open_failed(err); return end
     local pr, parse_err = decode(text)
-    if not pr then fail(parse_err); return end
+    if not pr then open_failed(parse_err); return end
     gh({"pr", "diff", tostring(number), "--repo", repo}, nil, function(diff, diff_err)
       if generation ~= state.open_generation then return end
-      if diff_err then fail(diff_err); return end
+      if diff_err then open_failed(diff_err); return end
       local id, view_err = ttt.open_changes({
         id = pr.html_url,
         title = "PR #" .. number .. ": " .. pr.title,
         description = "@" .. pr.user.login .. " · " .. pr.html_url .. "\n\n" .. (pr.body or ""),
         diff = diff,
       })
-      if not id then fail(view_err); return end
-      state.current = {repo = repo, number = number, title = pr.title, sha = pr.head.sha, tab = id}
-      state.status = state.list_status or ""
+      if not id then open_failed(view_err); return end
+      state.opening = nil
+      state.current = {repo = repo, number = number, title = pr.title, sha = pr.head.sha, tab = id,
+        comments = (tonumber(pr.comments) or 0) + (tonumber(pr.review_comments) or 0)}
     end)
   end)
 end
@@ -154,7 +172,6 @@ end
 
 local function finish_review(draft, message)
   draft.busy = false
-  state.status = message
   if review == draft then
     ttt.close_dialog()
     review = nil
@@ -217,7 +234,7 @@ local function open_comments()
   if not pr then ttt.notify("Open a pull request first"); return end
   local comments = {items = {}, pending = 3, errors = {}}
   ttt.open_drawer({side = "left", width = 85, min_width = 30, render = function(p)
-    p:hstack({height = 1, gap = 1, render = function(row)
+    p:hstack({height = 1, gap = 1, padding_right = 1, render = function(row)
       row:label({text = "Comments · PR #" .. pr.number, style = "bold", padding_left = 1})
       row:button({label = "Close", padding_left = 2, padding_right = 2, on_click = ttt.close_drawer})
     end})
@@ -319,12 +336,21 @@ ttt.register({
         row:input({value = state.url, placeholder = "https://github.com/owner/repo...", autofocus = true,
           on_change = function(text) state.url = text end,
           on_submit = function() load_prs() end})
-        row:button({label = "Load", padding_left = 2, padding_right = 2, on_click = load_prs})
+        row:button({label = "Load", padding_left = 2, padding_right = 2, on_click = function() load_prs() end})
       end})
       p:divider()
-      if state.current then
-        p:hstack({height = 2, gap = 1, padding_bottom = 1, render = function(row)
-          row:label({text = "#" .. state.current.number .. " " .. state.current.title, style = "muted"})
+      -- Same height as the PR section below, so the list doesn't jump while a PR loads.
+      if state.opening then
+        p:box({height = 3, render = function(box)
+          box:label({text = "Loading PR #" .. state.opening .. "…", style = "muted", padding_left = 1})
+        end})
+        p:divider()
+      elseif not state.current then
+        p:box({height = 3, render = function() end})
+        p:divider()
+      else
+        p:hstack({height = 1, gap = 1, padding_bottom = 1, render = function(row)
+          row:label({text = "#" .. state.current.number .. " " .. state.current.title, style = "muted", padding_left = 1})
           row:dropdown({label = "⋮", entries = {
             {label = "Comments", command = "comments"},
             {label = "Review", command = "review"},
@@ -338,34 +364,54 @@ ttt.register({
         end})
         p:hstack({height = 1, gap = 1, render = function(row)
           row:label("")
-          row:button({label = "Comments", padding_left = 2, padding_right = 2, on_click = open_comments})
+          row:button({label = "Comments (" .. state.current.comments .. ")", padding_left = 2, padding_right = 2,
+            on_click = open_comments})
           row:button({label = "Review", padding_left = 2, padding_right = 2, on_click = open_review})
         end})
         p:divider()
       end
+      if state.repo == "" then
+        p:box({height = 2, render = function() end})
+      else
+        local heading = state.single and "Pull request" or
+            (state.pr_state == "closed" and "Closed pull requests" or "Open pull requests")
+        local count = state.loading and "…" or (#state.prs >= 100 and "100+" or tostring(#state.prs))
+        p:hstack({height = 1, gap = 1, render = function(row)
+          row:label({text = heading, style = "muted", padding_left = 1})
+          row:box({width = ttt_text.width(count), render = function(box)
+            box:label({text = count, style = "muted"})
+          end})
+          row:dropdown({label = "⋮", entries = {
+            {label = "Open", command = "open", checked = state.pr_state == "open"},
+            {label = "Closed", command = "closed", checked = state.pr_state == "closed"},
+          }, on_menu = switch_pr_state})
+        end})
+        p:divider()
+      end
       p:vstack({padding_left = 1, padding_right = 1, render = function(list)
-        list:label({text = state.status, style = "muted"})
         if state.error ~= "" then list:label({text = state.error, style = "danger"}) end
         local items = {}
         for _, pr in ipairs(state.prs) do
-          if not state.current or state.current.number ~= pr.number then
-            items[#items + 1] = {id = tostring(pr.number), label = "#" .. pr.number .. " " .. pr.title,
-              badge = pr.isDraft and "draft" or "", muted = pr.isDraft}
-          end
+          local badge = pr.isDraft and "draft" or ""
+          if pr.state == "MERGED" then badge = "merged" elseif pr.state == "CLOSED" then badge = "closed" end
+          items[#items + 1] = {id = tostring(pr.number), label = "#" .. pr.number .. " " .. pr.title,
+            badge = badge, muted = pr.isDraft}
         end
-        list:list({items = items, on_command = function(command, node)
+        local active = state.opening or (state.current and state.current.number)
+        list:list({items = items, badge_right = true, active = active and tostring(active), on_command = function(command, node)
           if command == "activate" then open_pr(tonumber(node.id)) end
         end})
       end})
       if #state.saved > 0 then
         p:divider()
         p:label({text = "Saved repositories", style = "muted", padding_left = 1, padding_right = 1})
-        local items = {}
+        local items, active = {}, nil
         for _, url in ipairs(state.saved) do
           items[#items + 1] = {id = url, label = repository(url)}
+          if state.repo ~= "" and repository(url):lower() == state.repo:lower() then active = url end
         end
         p:box({height = 7, padding_left = 1, padding_right = 1, render = function(favorites)
-          favorites:list({items = items, on_command = function(command, node)
+          favorites:list({items = items, active = active, on_command = function(command, node)
             if command ~= "activate" or review and review.busy then return end
             state.url = node.id
             load_prs()
@@ -377,7 +423,7 @@ ttt.register({
   },
   commands = {
     {id = "pr-review.show", title = "PR Review: Show", handler = function() ttt.focus_panel("sidebar") end},
-    {id = "pr-review.load", title = "PR Review: Load", handler = load_prs},
+    {id = "pr-review.load", title = "PR Review: Load", handler = function() load_prs() end},
     {id = "pr-review.review", title = "PR Review: Review", handler = open_review},
     {id = "pr-review.comments", title = "PR Review: Comments", handler = open_comments},
   },
