@@ -77,7 +77,7 @@ def run_case(binary, scenario, action, merge=False, size="140x40"):
         commands = ['exec "PR Review: Show"',
                     'type ' + ("https://github.com/example/repo/pull/7" if direct else "example/repo"), 'key Enter']
         if not direct:
-            commands += ['wait-for "open PRs"', 'screenshot ' + str(artifacts / "sidebar.txt"), 'click 6 7']
+            commands += ['wait-for "open PRs"', 'screenshot ' + str(artifacts / "sidebar.txt"), 'click 6 11']
         commands += ['wait-for "PR #7: Fixture change"']
         if action == "SAVE":
             commands += ['click 29 6', 'wait-for "Save repository"', 'key Down', 'key Down', 'key Enter',

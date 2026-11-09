@@ -13,6 +13,6 @@
     "system.exec": [
       "gh"
     ],
-    "panel.drawer": true
+    "panel.editor": true
   }
 }
