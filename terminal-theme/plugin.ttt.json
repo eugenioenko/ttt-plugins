@@ -7,25 +7,10 @@
   "entry": "init.lua",
   "api": 1,
   "permissions": {
-    "fs.read": [
-      "~/.config/foot",
-      "~/.config/ghostty",
-      "~/.config/kitty",
-      "~/.config/alacritty",
-      "~/.config/wezterm",
-      "~/.wezterm.lua",
-      "~/.local/state/omarchy",
-      "~/Library/Application Support/com.mitchellh.ghostty",
-      "~/Library/Application Support/kitty",
-      "~/Library/Application Support/alacritty",
-      "~/Library/Application Support/wezterm",
-      "/usr/share/ghostty/themes",
-      "/Applications/Ghostty.app/Contents/Resources/ghostty/themes"
-    ],
     "fs.write": ["{config}/themes"],
     "settings": true,
     "settings_keys": ["theme"],
     "commands": true,
-    "system.env": true
+    "terminal.palette": true
   }
 }
