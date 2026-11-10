@@ -424,9 +424,9 @@ local reload_pending = false
 local palette_polls = 0
 local poll, report
 
-local function schedule_palette_poll()
+local function schedule_palette_poll(failure_reason)
   if palette_polls >= max_palette_polls then
-    report("terminal palette capture did not finish; reload the plugin to try again")
+    report(failure_reason or "terminal palette capture did not finish; reload the plugin to try again")
     return
   end
   palette_polls = palette_polls + 1
@@ -459,7 +459,7 @@ local function reload_active_theme()
     last_error = nil
   else
     report("snapshot updated, but settings.reload command was unavailable")
-    schedule_palette_poll()
+    schedule_palette_poll("settings.reload failed; snapshot is saved, reload the plugin to retry")
   end
 end
 
@@ -473,7 +473,7 @@ poll = function()
   local ok, result = pcall(term.palette)
   if not ok or type(result) ~= "table" then
     report("terminal palette API is unavailable; this TTT build may predate ttt.terminal.palette()")
-    schedule_palette_poll()
+		schedule_palette_poll("terminal palette API is unavailable; this TTT build may predate ttt.terminal.palette()")
     return
   end
   local status = result.status
@@ -485,14 +485,14 @@ poll = function()
   end
   if (status ~= "complete" and status ~= "partial") or type(result.colors) ~= "table" then
     report("terminal palette returned an invalid result; keeping the last snapshot")
-    schedule_palette_poll()
+		schedule_palette_poll("terminal palette returned an invalid result; keeping the last snapshot")
     return
   end
   local colors = result.colors
   local palette = { fg = normalize_color(colors["10"]), bg = normalize_color(colors["11"]), ansi = {} }
   if not palette.fg or not palette.bg then
     report("terminal palette has no valid foreground/background; keeping the last snapshot")
-    schedule_palette_poll()
+		schedule_palette_poll("terminal palette has no valid foreground/background; keeping the last snapshot")
     return
   end
   for index = 0, 15 do palette.ansi[index] = normalize_color(colors["4;" .. index]) end
@@ -527,7 +527,7 @@ poll = function()
   local written, write_error = fs.write(output_path, output)
   if not written then
     report("could not write " .. output_path .. "; create the themes directory (mkdir -p ~/.config/ttt/themes) or check its permissions: " .. tostring(write_error))
-    schedule_palette_poll()
+		schedule_palette_poll("could not write " .. output_path .. "; create the themes directory (mkdir -p ~/.config/ttt/themes) or check its permissions: " .. tostring(write_error))
     return
   end
 
@@ -544,7 +544,7 @@ end
 local function capture_and_poll()
   local ok, requested = pcall(term.request_palette)
   if not ok or requested == false then
-    report("could not request terminal palette capture")
+    report("could not request terminal palette capture; this TTT build may predate ttt.terminal.request_palette()")
     return
   end
   poll()

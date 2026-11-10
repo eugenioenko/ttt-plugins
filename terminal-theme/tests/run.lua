@@ -87,11 +87,8 @@ for _, status in ipairs({ "pending", "unavailable" }) do
   mock.run_next()
   eq(mock.requests, 1, status .. " polling does not request another capture")
   eq(#mock.writes, 1, status .. " can later complete")
-  local snapshot = mock.snapshot
-  mock.result = { status = status, colors = {} }
   eq(#mock.timers, 0, status .. " has no timer after success")
   eq(mock.requests, 1, status .. " later polls do not recapture")
-  eq(mock.snapshot, snapshot, status .. " preserves snapshot")
   eq(#mock.writes, 1, status .. " does not rewrite")
 end
 
@@ -142,7 +139,7 @@ eq(foot_rgb.encoded_theme.default.bg, "#122200", "Foot mixed-width RGB component
 eq(foot_rgb.encoded_theme.terminal.black, "#ff11ff", "one- and four-digit ANSI components normalize")
 eq(foot_rgb.encoded_theme.terminal.red, "#ffffff", "one- and three-digit components normalize")
 
-local partial = fresh({ result = { status = "partial", colors = {
+local partial = fresh({ command_failures = 1, result = { status = "partial", colors = {
   ["10"] = "rgb:ffff/8080/0000", ["11"] = "rgb:0000/0000/0000", ["4;0"] = "rgb:1111/2222/3333",
 } } })
 eq(#partial.writes, 1, "valid partial palette can be used")
@@ -151,6 +148,7 @@ eq(partial.encoded_theme.terminal.black, "#112233", "partial ANSI value retained
 eq(partial.encoded_theme.terminal.red, "#f44747", "missing partial ANSI value falls back")
 local partial_snapshot = partial.snapshot
 partial.result = { status = "partial", colors = { ["10"] = "rgb:ffff/ffff/ffff" } }
+partial.run_next()
 eq(partial.snapshot, partial_snapshot, "partial success leaves snapshot unchanged")
 
 local malformed = fresh({ result = { status = "complete", colors = {
@@ -176,9 +174,9 @@ eq(#reload_retry.writes, 1, "reload retry does not rewrite snapshot")
 eq(#reload_retry.commands, 2, "failed reload retried")
 eq(#reload_retry.timers, 0, "successful reload retry leaves no timer")
 
-local preserve = fresh({ result = palette() })
+local preserve = fresh({ command_failures = 1, result = palette() })
 local original = preserve.snapshot
 preserve.result = palette("invalid", "#123456")
-eq(#preserve.timers, 0, "successful capture has no callback for later palette changes")
+preserve.run_next()
 eq(preserve.snapshot, original, "invalid complete palette preserves prior snapshot")
 print("terminal theme palette tests passed")

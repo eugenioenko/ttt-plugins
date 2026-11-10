@@ -13,7 +13,7 @@ The `ttt.terminal.palette()` API and `terminal.palette` permission are available
 ## How it works
 
 - Requests one terminal palette capture per plugin load, after the plugin is wired, then checks the resulting snapshot with temporary timeouts while it is pending.
-- Writes `{config}/themes/terminal.json` only when the parsed palette changes. It never switches the selected theme.
+- Writes `{config}/themes/terminal.json` once per plugin load, then again only if the generated palette changes during that load. It never compares against the existing on-disk file or switches the selected theme.
 - Runs `settings.reload` after a successful write, and only while the `theme` setting is exactly `terminal`.
 - Pending/unavailable results, API errors, and write failures are retried with one-shot 250 ms timeouts for up to 80 retries (20 seconds), without another capture or OSC request. This allows core's capture to finish even after two coalesced rounds of OSC queries (up to 14 seconds). Complete and valid partial results stop polling; reloading the plugin requests a fresh capture.
 - The snapshot is never deleted, so it remains available if the plugin is disabled or uninstalled.
