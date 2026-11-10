@@ -24,9 +24,10 @@ Ghostty `theme =` names are resolved from `~/.config/ghostty/themes`, the macOS 
 
 The source terminal is selected in this order:
 
-1. `TTT_TERMINAL_THEME` (`foot`, `ghostty`, `kitty`, `alacritty`, or `wezterm`).
-2. The environment: `TERM`, `TERM_PROGRAM`, `KITTY_WINDOW_ID`, `WEZTERM_PANE`, `ALACRITTY_SOCKET`, and Ghostty's resource variables.
-3. Probing the known config paths. If several exist, the first in the table above is used and the ambiguity is logged with a `TTT_TERMINAL_THEME` hint.
+1. `TTT_TERMINAL_THEME` (`foot`, `ghostty`, `kitty`, `alacritty`, `wezterm`, or `env`).
+2. `TTT_TERMINAL_PALETTE`, a JSON object with `fg`/`foreground`, `bg`/`background`, and optional `ansi` (16 colors), `selection`, and `cursor`. This takes precedence over terminal detection and is useful when ttt runs on a remote host or inside a container whose terminal palette lives elsewhere (for example, forwarded from the desktop over SSH).
+3. The environment: `TERM`, `TERM_PROGRAM`, `KITTY_WINDOW_ID`, `WEZTERM_PANE`, `ALACRITTY_SOCKET`, and Ghostty's resource variables.
+4. Probing the known config paths. If several exist, the first in the table above is used and the ambiguity is logged with a `TTT_TERMINAL_THEME` hint.
 
 If the environment identifies a terminal whose config file does not exist, the plugin reports `… config not found` instead of silently borrowing another terminal's palette. Set `TTT_TERMINAL_THEME` to point at a terminal whose config does exist.
 

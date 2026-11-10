@@ -57,6 +57,97 @@ local function encode_json(value)
   return "{" .. table.concat(parts, ",") .. "}"
 end
 
+
+local function decode_json(value)
+  local i = 1
+  local function skip() while i <= #value and value:sub(i, i):match("%s") do i = i + 1 end end
+  local parse_value
+  local function parse_string()
+    assert(value:sub(i, i) == '"', "expected string")
+    i = i + 1
+    local out = {}
+    while i <= #value do
+      local c = value:sub(i, i)
+      if c == '"' then i = i + 1; return table.concat(out) end
+      if c == "\\" then
+        local n = value:sub(i + 1, i + 1)
+        if n == "n" then out[#out + 1] = "\n"; i = i + 2
+        elseif n == "t" then out[#out + 1] = "\t"; i = i + 2
+        elseif n == "r" then out[#out + 1] = "\r"; i = i + 2
+        elseif n == '"' then out[#out + 1] = '"'; i = i + 2
+        elseif n == "\\" then out[#out + 1] = "\\"; i = i + 2
+        elseif n == "/" then out[#out + 1] = "/"; i = i + 2
+        elseif n == "u" then
+          local hex = value:sub(i + 2, i + 5)
+          out[#out + 1] = string.char(tonumber(hex, 16))
+          i = i + 6
+        else
+          error("bad escape")
+        end
+      else
+        out[#out + 1] = c
+        i = i + 1
+      end
+    end
+    error("unterminated string")
+  end
+  local function parse_number()
+    local start = i
+    while i <= #value and value:sub(i, i):match("[%d%+%-%eE%.]") do i = i + 1 end
+    return tonumber(value:sub(start, i - 1))
+  end
+  local function parse_array()
+    assert(value:sub(i, i) == "[", "expected array")
+    i = i + 1
+    skip()
+    local arr = {}
+    if value:sub(i, i) == "]" then i = i + 1; return arr end
+    while true do
+      arr[#arr + 1] = parse_value()
+      skip()
+      if value:sub(i, i) == "," then i = i + 1; skip()
+      elseif value:sub(i, i) == "]" then i = i + 1; break
+      else error("expected , or ]") end
+    end
+    return arr
+  end
+  local function parse_object()
+    assert(value:sub(i, i) == "{", "expected object")
+    i = i + 1
+    skip()
+    local obj = {}
+    if value:sub(i, i) == "}" then i = i + 1; return obj end
+    while true do
+      skip()
+      local key = parse_string()
+      skip()
+      assert(value:sub(i, i) == ":", "expected :")
+      i = i + 1
+      skip()
+      obj[key] = parse_value()
+      skip()
+      if value:sub(i, i) == "," then i = i + 1; skip()
+      elseif value:sub(i, i) == "}" then i = i + 1; break
+      else error("expected , or }") end
+    end
+    return obj
+  end
+  parse_value = function()
+    skip()
+    local c = value:sub(i, i)
+    if c == '"' then return parse_string()
+    elseif c == "{" then return parse_object()
+    elseif c == "[" then return parse_array()
+    elseif c == "t" then assert(value:sub(i, i + 3) == "true"); i = i + 4; return true
+    elseif c == "f" then assert(value:sub(i, i + 4) == "false"); i = i + 5; return false
+    elseif c == "n" then assert(value:sub(i, i + 3) == "null"); i = i + 4; return nil
+    else return parse_number() end
+  end
+  local result = parse_value()
+  skip()
+  return result
+end
+
 local function reader_for(files)
   return function(path)
     local value = files[path]
@@ -150,6 +241,9 @@ local function load_plugin(options)
     encode = function(theme)
       mock.theme = theme
       return encode_json(theme)
+    end,
+    decode = function(value)
+      return decode_json(value)
     end,
   }
   local system = {
@@ -451,6 +545,13 @@ eq(wezterm_palette.bg, "#05182e", "wezterm background")
 eq(wezterm_palette.ansi[2], "#028391", "wezterm green")
 eq(wezterm_palette.selection, "#134e5a", "wezterm selection")
 
+local _env_json = '{"fg":"#f6dcac","bg":"#05182e","ansi":[],"selection":"#134e5a"}'
+local _env = env_for({ TTT_TERMINAL_PALETTE = _env_json })
+local env_direct, env_err = M.load_palette("env", "TTT_TERMINAL_PALETTE", reader_for({}), _env)
+eq(env_direct.fg, "#f6dcac", "env foreground")
+eq(env_direct.bg, "#05182e", "env background")
+eq(env_direct.selection, "#134e5a", "env selection")
+
 local scheme_only, scheme_error = M.load_palette("wezterm", wezterm_main_path, reader_for({
   [wezterm_main_path] = "return { color_scheme = 'Cool' }\n",
 }), env_for({}))
@@ -658,6 +759,52 @@ local no_notify = load_plugin({
 eq(#no_notify.writes, 0, "invalid palette is not written")
 eq(#no_notify.logs, 1, "host without ttt.notify still logs")
 contains(no_notify.logs[1][2], "Terminal theme: ", "log prefix")
+
+-- Environment palette ----------------------------------------------------
+
+local env_json = encode_json({
+  fg = "#f6dcac",
+  bg = "#05182e",
+  selection = "#134e5a",
+  cursor = "#f6dcac",
+  ansi = {
+    "#05182e", "#f85525", "#028391", "#e97b3c",
+    "#3f8f8a", "#3f8f8a", "#8cbfb8", "#f6dcac",
+    "#2a6b78", "#f85525", "#028391", "#e97b3c",
+    "#faa968", "#3f8f8a", "#8cbfb8", "#f6dcac",
+  },
+})
+
+local env_plugin = load_plugin({
+  files = { [foot_main_path] = foot_main },
+  env = { TERM = "xterm-256color", TTT_TERMINAL_PALETTE = env_json },
+})
+eq(env_plugin.writes[1].path, output_path, "env palette writes snapshot")
+contains(env_plugin.writes[1].content, '"default":{"bg":"#05182e","fg":"#f6dcac"}', "env palette content")
+assert(env_plugin.env_reads[#env_plugin.env_reads] == "TTT_TERMINAL_PALETTE", "reads env palette")
+-- env palette wins over detected terminal configs
+assert(not (env_plugin.reads[1] == foot_main_path), "env palette does not read foot config first")
+
+local env_foreground_keys = load_plugin({
+  env = { TTT_TERMINAL_PALETTE = encode_json({
+    foreground = "#ffffff",
+    background = "#000000",
+    ansi = {},
+  }) },
+})
+eq(env_foreground_keys.writes[1].path, output_path, "foreground/background keys accepted")
+
+local env_invalid = load_plugin({
+  env = { TTT_TERMINAL_PALETTE = "{not json" },
+})
+eq(#env_invalid.writes, 0, "invalid env palette is not written")
+contains(env_invalid.logs[1][2], "TTT_TERMINAL_PALETTE must be a JSON object", "invalid env error")
+
+local env_missing = load_plugin({
+  env = { TTT_TERMINAL_PALETTE = encode_json({ fg = "#ffffff" }) },
+})
+eq(#env_missing.writes, 0, "env palette missing bg is not written")
+contains(env_missing.logs[1][2], "must include fg/foreground and bg/background", "missing field error")
 
 -- Permission hygiene ------------------------------------------------------
 

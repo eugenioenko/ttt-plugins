@@ -964,6 +964,8 @@ local function load_alacritty(path, state)
   return merge_palette(result, palette_from_alacritty(parsed))
 end
 
+local json = require("ttt.json")
+
 local LOADERS = {
   foot = load_foot,
   kitty = load_kitty,
@@ -976,6 +978,29 @@ local LOADERS = {
     local palette = palette_from_wezterm(parsed.tables)
     if not palette.fg and not palette.bg and parsed.color_scheme then
       return nil, "WezTerm color_scheme names are not resolved; define config.colors or set TTT_TERMINAL_THEME"
+    end
+    return palette
+  end,
+  env = function(path, state)
+    local raw = state.env("TTT_TERMINAL_PALETTE")
+    if raw == "" then return nil, "TTT_TERMINAL_PALETTE is empty" end
+    local ok, decoded = pcall(json.decode, raw)
+    if not ok or type(decoded) ~= "table" then
+      return nil, "TTT_TERMINAL_PALETTE must be a JSON object"
+    end
+    local palette = {}
+    palette.fg = decoded.fg or decoded.foreground
+    palette.bg = decoded.bg or decoded.background
+    if type(decoded.ansi) == "table" then
+      palette.ansi = {}
+      for index, value in ipairs(decoded.ansi) do
+        palette.ansi[index - 1] = value
+      end
+    end
+    palette.selection = decoded.selection
+    palette.cursor = decoded.cursor
+    if not palette.fg or not palette.bg then
+      return nil, "TTT_TERMINAL_PALETTE must include fg/foreground and bg/background"
     end
     return palette
   end,
@@ -1142,6 +1167,11 @@ end
 
 local SOURCES = {
   {
+    id = "env",
+    label = "Environment",
+    paths = {},
+  },
+  {
     id = "foot",
     label = "Foot",
     paths = { "~/.config/foot/foot.ini" },
@@ -1224,11 +1254,15 @@ function M.detect(env, exists)
   if forced ~= "" and forced:lower() ~= "auto" then
     local source = source_by_id(forced:lower())
     if not source then
-      return nil, nil, "unknown TTT_TERMINAL_THEME " .. forced .. "; use foot, ghostty, kitty, alacritty, or wezterm"
+      return nil, nil, "unknown TTT_TERMINAL_THEME " .. forced .. "; use foot, ghostty, kitty, alacritty, wezterm, or env"
     end
     local path = source_path(source, exists)
-    if not path then return nil, nil, source.label .. " config not found" end
-    return source.id, path
+    if not path and source.id ~= "env" then return nil, nil, source.label .. " config not found" end
+    return source.id, path or "TTT_TERMINAL_PALETTE"
+  end
+
+  if (env("TTT_TERMINAL_PALETTE") or "") ~= "" then
+    return "env", "TTT_TERMINAL_PALETTE"
   end
 
   local detected = detect_from_env(env)
@@ -1260,7 +1294,6 @@ end
 local ttt = require("ttt")
 local fs = require("ttt.fs")
 local settings = require("ttt.settings")
-local json = require("ttt.json")
 local system = require("ttt.system")
 
 local last_input_key
