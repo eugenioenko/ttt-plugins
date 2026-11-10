@@ -2,7 +2,8 @@ local M = {}
 
 local theme_name = "terminal"
 local output_path = "{config}/themes/terminal.json"
-local poll_interval_ms = 2000
+local poll_timeout_ms = 250
+local max_palette_polls = 80
 local minimum_contrast_ratio = 4.5
 local selection_blend = 0.28
 local surface_blend = 0.08
@@ -420,8 +421,19 @@ local last_output
 local last_error
 local last_info
 local reload_pending = false
+local palette_polls = 0
+local poll, report
 
-local function report(message)
+local function schedule_palette_poll()
+  if palette_polls >= max_palette_polls then
+    report("terminal palette capture did not finish; reload the plugin to try again")
+    return
+  end
+  palette_polls = palette_polls + 1
+  ttt.set_timeout(poll_timeout_ms, poll)
+end
+
+report = function(message)
   if message == last_error then return end
   ttt.log("warn", "Terminal theme: " .. message)
   if ttt.notify then ttt.notify("Terminal theme: " .. message, "warn") end
@@ -447,6 +459,7 @@ local function reload_active_theme()
     last_error = nil
   else
     report("snapshot updated, but settings.reload command was unavailable")
+    schedule_palette_poll()
   end
 end
 
@@ -456,26 +469,30 @@ local function palette_key(palette)
   return table.concat(parts, "|")
 end
 
-local function poll()
+poll = function()
   local ok, result = pcall(term.palette)
   if not ok or type(result) ~= "table" then
     report("terminal palette API is unavailable; this TTT build may predate ttt.terminal.palette()")
+    schedule_palette_poll()
     return
   end
   local status = result.status
-  if status == "pending" then return end
+  if status == "pending" then schedule_palette_poll(); return end
   if status == "unavailable" then
     report("the client terminal did not provide a palette; keeping the last snapshot")
+    schedule_palette_poll()
     return
   end
   if (status ~= "complete" and status ~= "partial") or type(result.colors) ~= "table" then
     report("terminal palette returned an invalid result; keeping the last snapshot")
+    schedule_palette_poll()
     return
   end
   local colors = result.colors
   local palette = { fg = normalize_color(colors["10"]), bg = normalize_color(colors["11"]), ansi = {} }
   if not palette.fg or not palette.bg then
     report("terminal palette has no valid foreground/background; keeping the last snapshot")
+    schedule_palette_poll()
     return
   end
   for index = 0, 15 do palette.ansi[index] = normalize_color(colors["4;" .. index]) end
@@ -510,6 +527,7 @@ local function poll()
   local written, write_error = fs.write(output_path, output)
   if not written then
     report("could not write " .. output_path .. "; create the themes directory (mkdir -p ~/.config/ttt/themes) or check its permissions: " .. tostring(write_error))
+    schedule_palette_poll()
     return
   end
 
@@ -534,6 +552,5 @@ end
 
 ttt.register({})
 ttt.set_timeout(100, capture_and_poll)
-ttt.set_interval(poll_interval_ms, poll)
 
 return M

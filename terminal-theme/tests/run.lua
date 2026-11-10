@@ -27,7 +27,7 @@ local function fresh(options)
   local mock = {
     result = options.result or { status = "pending", colors = {} },
     selected_theme = options.selected_theme or "terminal",
-    writes = {}, commands = {}, logs = {}, notifications = {}, requests = 0,
+    writes = {}, commands = {}, logs = {}, notifications = {}, requests = 0, timers = {}, elapsed = 0,
     write_error = options.write_error,
     command_failures = options.command_failures or 0,
   }
@@ -40,8 +40,9 @@ local function fresh(options)
       if mock.command_failures > 0 then mock.command_failures = mock.command_failures - 1; return false end
       return true
     end,
-    set_timeout = function(_, callback) mock.startup = callback end,
-    set_interval = function(_, callback) mock.poll = callback end,
+    set_timeout = function(delay, callback)
+      mock.timers[#mock.timers + 1] = { delay = delay, callback = callback }
+    end,
   }
   local fs = { write = function(path, content)
     if mock.write_error then return nil, mock.write_error end
@@ -61,7 +62,12 @@ local function fresh(options)
     palette = function() return mock.result end,
   } end
   mock.plugin = dofile(root .. "/init.lua")
-  mock.startup()
+  local startup = table.remove(mock.timers, 1)
+  startup.callback()
+  mock.run_next = function()
+    local timer = table.remove(mock.timers, 1)
+    if timer then mock.elapsed = mock.elapsed + timer.delay; timer.callback() end
+  end
   return mock
 end
 
@@ -71,22 +77,45 @@ local function palette(fg, bg)
   return { status = "complete", colors = colors }
 end
 
--- Non-final capture states must not write or erase an existing snapshot.
-for _, status in ipairs({ "pending", "partial", "unavailable" }) do
+-- Pending is retried with one-shot timers; successful/partial outcomes stop.
+for _, status in ipairs({ "pending", "unavailable" }) do
   local mock = fresh({ result = { status = status, colors = {} } })
   eq(mock.requests, 1, status .. " requests capture once on load")
   eq(#mock.writes, 0, status .. " does not write")
+  eq(#mock.timers, 1, status .. " schedules one temporary retry")
   mock.result = palette()
-  mock.poll()
+  mock.run_next()
   eq(mock.requests, 1, status .. " polling does not request another capture")
   eq(#mock.writes, 1, status .. " can later complete")
   local snapshot = mock.snapshot
   mock.result = { status = status, colors = {} }
-  mock.poll()
+  eq(#mock.timers, 0, status .. " has no timer after success")
   eq(mock.requests, 1, status .. " later polls do not recapture")
   eq(mock.snapshot, snapshot, status .. " preserves snapshot")
   eq(#mock.writes, 1, status .. " does not rewrite")
 end
+
+local pending = fresh({ result = { status = "pending", colors = {} } })
+for _ = 1, 80 do pending.run_next() end
+eq(#pending.timers, 0, "pending retries are bounded")
+eq(pending.requests, 1, "pending retries never issue another OSC request")
+assert(pending.elapsed >= 20000, "retry budget exceeds 14 seconds")
+
+for _, polls in ipairs({ 30, 58 }) do
+  local delayed = fresh({ result = { status = "pending", colors = {} } })
+  for _ = 1, polls do delayed.run_next() end
+  assert(delayed.elapsed > (polls == 30 and 7000 or 14000), "pending beyond capture window")
+  eq(#delayed.writes, 0, "pending does not write before eventual completion")
+  delayed.result = palette()
+  delayed.run_next()
+  eq(#delayed.writes, 1, "late complete capture writes a snapshot")
+  eq(#delayed.timers, 0, "late success cancels further retries")
+  eq(delayed.requests, 1, "late success did not recapture")
+end
+
+local partial = fresh({ result = { status = "partial", colors = palette().colors } })
+eq(#partial.writes, 1, "valid partial result writes")
+eq(#partial.timers, 0, "partial success leaves no timer")
 
 local complete = fresh({ result = palette() })
 eq(#complete.writes, 1, "complete writes once")
@@ -96,9 +125,8 @@ eq(complete.encoded_theme.default.bg, "#123456", "OSC 11 maps background")
 eq(complete.encoded_theme.terminal.black, string.format("#%06x", 0x10203), "OSC 4;0 maps ANSI black")
 eq(complete.encoded_theme.terminal.brightWhite, string.format("#%06x", 0x10203 + 15 * 0x10101), "OSC 4;15 maps bright white")
 eq(complete.commands[1], "settings.reload", "reload command")
-complete.poll()
-eq(#complete.writes, 1, "unchanged palette does not write")
-eq(#complete.commands, 1, "unchanged palette does not reload again")
+eq(#complete.timers, 0, "complete success leaves no timer")
+eq(#complete.commands, 1, "complete palette reloads once")
 eq(complete.requests, 1, "unchanged snapshot does not request another capture")
 
 local reloaded = fresh({ result = palette("#fedcba") })
@@ -123,8 +151,7 @@ eq(partial.encoded_theme.terminal.black, "#112233", "partial ANSI value retained
 eq(partial.encoded_theme.terminal.red, "#f44747", "missing partial ANSI value falls back")
 local partial_snapshot = partial.snapshot
 partial.result = { status = "partial", colors = { ["10"] = "rgb:ffff/ffff/ffff" } }
-partial.poll()
-eq(partial.snapshot, partial_snapshot, "partial palette without background preserves snapshot")
+eq(partial.snapshot, partial_snapshot, "partial success leaves snapshot unchanged")
 
 local malformed = fresh({ result = { status = "complete", colors = {
   ["10"] = "rgb:ffff/xyz/0000", ["11"] = "rgb:0000/0000/0000",
@@ -138,18 +165,20 @@ eq(#gated.commands, 0, "reload gated to terminal theme")
 local retry = fresh({ result = palette(), write_error = "read-only" })
 eq(#retry.writes, 0, "failed write not recorded")
 retry.write_error = nil
-retry.poll()
+retry.run_next()
 eq(#retry.writes, 1, "write retried on next poll")
+eq(#retry.timers, 0, "successful write retry leaves no timer")
 
 local reload_retry = fresh({ result = palette(), command_failures = 1 })
 eq(#reload_retry.commands, 1, "first reload attempted")
-reload_retry.poll()
+reload_retry.run_next()
 eq(#reload_retry.writes, 1, "reload retry does not rewrite snapshot")
 eq(#reload_retry.commands, 2, "failed reload retried")
+eq(#reload_retry.timers, 0, "successful reload retry leaves no timer")
 
 local preserve = fresh({ result = palette() })
 local original = preserve.snapshot
 preserve.result = palette("invalid", "#123456")
-preserve.poll()
+eq(#preserve.timers, 0, "successful capture has no callback for later palette changes")
 eq(preserve.snapshot, original, "invalid complete palette preserves prior snapshot")
 print("terminal theme palette tests passed")

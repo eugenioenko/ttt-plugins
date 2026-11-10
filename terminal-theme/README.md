@@ -12,10 +12,10 @@ The `ttt.terminal.palette()` API and `terminal.palette` permission are available
 
 ## How it works
 
-- Requests one terminal palette capture per plugin load, after the plugin is wired, then checks the resulting snapshot every two seconds.
+- Requests one terminal palette capture per plugin load, after the plugin is wired, then checks the resulting snapshot with temporary timeouts while it is pending.
 - Writes `{config}/themes/terminal.json` only when the parsed palette changes. It never switches the selected theme.
 - Runs `settings.reload` after a successful write, and only while the `theme` setting is exactly `terminal`.
-- Pending results are ignored without starting another capture. Unavailable palettes, invalid required colors, and write failures leave the previous snapshot untouched and are reported.
+- Pending/unavailable results, API errors, and write failures are retried with one-shot 250 ms timeouts for up to 80 retries (20 seconds), without another capture or OSC request. This allows core's capture to finish even after two coalesced rounds of OSC queries (up to 14 seconds). Complete and valid partial results stop polling; reloading the plugin requests a fresh capture.
 - The snapshot is never deleted, so it remains available if the plugin is disabled or uninstalled.
 - Colors used for TTT UI and syntax highlighting are contrast-corrected against the terminal background. The 16 `terminal` ANSI colors are copied unchanged so TTT's integrated terminal matches the source terminal.
 
@@ -72,11 +72,11 @@ The plugin reads only `settings.theme` and the palette returned by core; it neve
 
 ## Limitations
 
-- Palette capture is performed asynchronously by core after one `terminal.request_palette()` call per plugin load. Core makes 20 OSC color queries for that capture. The plugin polls the captured snapshot only and sends no further queries; reloading the plugin requests another single capture.
+- Palette capture is performed asynchronously by core after one `terminal.request_palette()` call per plugin load. Core makes 20 OSC color queries for that capture. The plugin checks the captured snapshot using one-shot timeouts (never a permanent interval) and sends no further queries; reloading the plugin requests another single capture.
 
 ## Write behavior
 
-The snapshot is built in memory and written with a single scoped filesystem write. The plugin retries failed writes on the next poll and never removes the snapshot.
+The snapshot is built in memory and written with a single scoped filesystem write. Failed writes and `settings.reload` calls get bounded timeout retries; the plugin never removes the snapshot.
 
 Empty style groups (for example `button.focused`, `syntax.bold`, `fileIcons.red`) are omitted from the snapshot rather than written as `[]`, because TTT decodes those keys into structs and every empty Lua table encodes as an array. The host rejects the whole file with `cannot unmarshal array into Go struct field ... of type config.StyleDef` and stops reading there, so an omitted key — which keeps TTT's own default — is both safer and equivalent.
 
