@@ -1,0 +1,16 @@
+{
+  "name": "terminal-theme",
+  "displayName": "Terminal Theme",
+  "description": "Generate a TTT theme snapshot from the palette of the terminal running TTT.",
+  "version": "0.1.0",
+  "author": "danielmrdev",
+  "entry": "init.lua",
+  "api": 1,
+  "permissions": {
+    "fs.write": ["{config}/themes"],
+    "settings": true,
+    "settings_keys": ["theme"],
+    "commands": true,
+    "terminal.palette": true
+  }
+}
