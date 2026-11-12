@@ -428,12 +428,12 @@ local function open_review()
   local shown = ttt.open_dialog({
     title = "Review PR #" .. draft.pr.number,
     width = 76,
-    height = 18,
+    height = 14,
     on_close = function() if review == draft and not draft.busy then review = nil end end,
     render = function(p)
       p:label({text = draft.pr.title, style = "bold"})
       local _, height = p:size()
-      local rows = math.max(1, math.min(6, height - 9))
+      local rows = math.max(1, math.min(6, height - 8))
       p:label({text = "Message · Enter adds a line", style = "muted"})
       p:box({border = true, padding_left = 1, padding_right = 1, render = function(box)
         box:input({placeholder = "Write your review…", prefix = " ", multiline = true,
@@ -444,7 +444,7 @@ local function open_review()
       p:checkbox({label = "Merge after approval (squash)", checked = draft.merge,
         on_change = function(checked) if not draft.busy then draft.merge = checked end end})
       p:label({text = draft.busy and "Submitting…" or draft.error, style = draft.error ~= "" and "danger" or "muted"})
-      p:hstack({height = 3, gap = 1, padding_top = 1, padding_bottom = 1, render = function(row)
+      p:hstack({height = 2, gap = 1, padding_top = 1, render = function(row)
         row:label("")
         row:button({label = "Cancel", padding_left = 2, padding_right = 2, on_click = function() if not draft.busy then ttt.close_dialog() end end})
         if draft.submitted then
