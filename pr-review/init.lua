@@ -11,6 +11,8 @@ local state = {
   saved = {},
   pr_state = "open",
   comment_tabs = {},
+  ci_tabs = {},
+  timeline_tabs = {},
   loading = false,
   error = "",
   list_generation = 0,
@@ -43,7 +45,7 @@ end
 
 local function decode(text)
   local ok, value = pcall(json.decode, text)
-  if ok then return value end
+  if ok and value ~= nil then return value end
   return nil, "GitHub returned invalid JSON"
 end
 
@@ -132,6 +134,209 @@ local function switch_pr_state(pr_state)
   redraw()
 end
 
+local CI_STATES = {
+  success = {icon = "✓", style = "success", label = "Passed", bucket = "passed"},
+  failure = {icon = "✕", style = "danger", label = "Failed", bucket = "failed"},
+  error = {icon = "✕", style = "danger", label = "Failed", bucket = "failed"},
+  timed_out = {icon = "✕", style = "danger", label = "Timed out", bucket = "failed"},
+  action_required = {icon = "✕", style = "danger", label = "Action required", bucket = "failed"},
+  stale = {icon = "✕", style = "danger", label = "Stale", bucket = "failed"},
+  cancelled = {icon = "−", style = "muted", label = "Cancelled", bucket = "skipped"},
+  skipped = {icon = "−", style = "muted", label = "Skipped", bucket = "skipped"},
+  neutral = {icon = "−", style = "muted", label = "Neutral", bucket = "skipped"},
+  in_progress = {icon = "◷", style = "muted", label = "Running", bucket = "pending"},
+}
+local CI_PENDING = {icon = "◷", style = "muted", label = "Pending", bucket = "pending"}
+
+local function ci_live(ci)
+  return state.current and state.current.ci == ci or state.ci_tabs[ci.id] == ci
+end
+
+local function refresh_ci(ci)
+  if ci.loading or not ci_live(ci) then return end
+  ci.loading = true
+  local jobs, errors, pending = {}, {}, 2
+  local base = "repos/" .. ci.repo .. "/commits/" .. ci.sha
+  for _, source in ipairs({
+    {path = base .. "/check-runs?filter=latest&per_page=100", query = ".check_runs[] | @json", checks = true},
+    {path = base .. "/status?per_page=100", query = ".statuses[] | @json"},
+  }) do
+    gh({"api", "--paginate", source.path, "--jq", source.query}, nil, function(text, err)
+      if not ci_live(ci) then ci.loading = false; return end
+      if err then
+        errors[#errors + 1] = tostring(err)
+      else
+        for line in text:gmatch("[^\r\n]+") do
+          local job, parse_err = decode(line)
+          if type(job) ~= "table" or type(job.name or job.context) ~= "string" then
+            errors[#errors + 1] = parse_err or "GitHub returned an invalid CI job"
+            break
+          end
+          local status = source.checks and (job.status == "completed" and job.conclusion or job.status) or job.state
+          jobs[#jobs + 1] = {name = job.name or job.context, status = CI_STATES[status] or CI_PENDING}
+        end
+      end
+      pending = pending - 1
+      if pending == 0 then
+        table.sort(jobs, function(a, b) return a.name:lower() < b.name:lower() end)
+        ci.jobs, ci.errors, ci.loading, ci.loaded = jobs, errors, false, true
+        ci.counts = {passed = 0, pending = 0, failed = 0, skipped = 0}
+        for _, job in ipairs(jobs) do
+          local bucket = job.status.bucket
+          ci.counts[bucket] = ci.counts[bucket] + 1
+        end
+      end
+    end)
+  end
+end
+
+local function ci_counts(ci)
+  if not ci or not ci.loaded then return {{text = "…", style = "muted"}} end
+  if #ci.errors > 0 then return {{text = "!", style = "danger"}} end
+  local c = ci.counts
+  local counts = {
+    {text = tostring(c.passed), style = "success"},
+    {text = tostring(c.pending), style = "warning"},
+    {text = tostring(c.failed), style = "danger"},
+  }
+  if c.skipped > 0 then counts[#counts + 1] = {text = tostring(c.skipped), style = "muted"} end
+  return counts
+end
+
+local function open_ci()
+  local pr = state.current
+  if not pr then ttt.notify("Open a pull request first"); return end
+  local ci = pr.ci
+  if state.ci_tabs[ci.id] then ttt.focus_tab(ci.id); return end
+  state.ci_tabs[ci.id] = ci
+  ttt.open_tab({id = ci.id, title = "CI · PR #" .. pr.number,
+    on_close = function() state.ci_tabs[ci.id] = nil end,
+    render = function(p)
+      p:hstack({height = 1, gap = 1, padding_left = 1, padding_right = 1, render = function(row)
+        row:label({text = "CI · " .. ci.repo .. " #" .. pr.number, style = "bold"})
+        row:button({label = "Refresh", disabled = ci.loading, on_click = function() refresh_ci(ci) end})
+      end})
+      p:label({text = "Commit " .. ci.sha:sub(1, 8) .. " · Updates every 30s", style = "muted", padding_left = 1})
+      p:divider()
+      if ci.loading then p:label({text = "Loading CI…", style = "muted", padding_left = 1}) end
+      for _, err in ipairs(ci.errors) do p:label({text = err, style = "danger", padding_left = 1}) end
+      if ci.loaded and not ci.loading and #ci.jobs == 0 and #ci.errors == 0 then
+        p:label({text = "No CI jobs reported for this commit.", style = "muted", padding_left = 1})
+      end
+      p:scrollview({render = function(list)
+        for _, job in ipairs(ci.jobs) do
+          list:hstack({height = 1, gap = 1, padding_left = 1, padding_right = 1, render = function(row)
+            row:label({text = job.status.icon, style = job.status.style, width = 2})
+            row:label({text = job.name, style = job.status.style})
+            row:label({text = job.status.label, style = job.status.style, width = 16})
+          end})
+        end
+      end})
+    end,
+  })
+  refresh_ci(ci)
+end
+
+local function commit_person(account, identity)
+  if type(account) == "table" and type(account.login) == "string" then return "@" .. account.login end
+  if type(identity) == "table" and type(identity.name) == "string" then return identity.name end
+  return "Unknown"
+end
+
+local function commit_date(identity)
+  local date = type(identity) == "table" and identity.date
+  if type(date) ~= "string" then return "Unknown" end
+  return date:gsub("T", " "):gsub("Z$", " UTC")
+end
+
+local function open_timeline()
+  local pr = state.current
+  if not pr then ttt.notify("Open a pull request first"); return end
+  local id = "timeline:" .. pr.repo .. "#" .. pr.number
+  if state.timeline_tabs[id] then
+    ttt.focus_tab(id)
+    state.timeline_tabs[id].refresh()
+    return
+  end
+  local timeline = {commits = {}, rows = {}, loading = false, error = "", selected = 1}
+  state.timeline_tabs[id] = timeline
+  local function refresh()
+    if timeline.loading then return end
+    timeline.loading, timeline.error = true, ""
+    gh({"api", "--paginate", "repos/" .. pr.repo .. "/pulls/" .. pr.number .. "/commits?per_page=100",
+        "--jq", ".[] | @json"}, nil, function(text, err)
+      if state.timeline_tabs[id] ~= timeline then return end
+      timeline.loading = false
+      if err then timeline.error = tostring(err); return end
+      local commits, rows = {}, {}
+      for line in text:gmatch("[^\r\n]+") do
+        local item, parse_err = decode(line)
+        if type(item) ~= "table" or type(item.sha) ~= "string" or
+            type(item.commit) ~= "table" or type(item.commit.message) ~= "string" then
+          timeline.error = parse_err or "GitHub returned an invalid commit"
+          return
+        end
+        local commit = item.commit
+        commits[#commits + 1] = {
+          sha = item.sha, author = commit_person(item.author, commit.author),
+          committer = commit_person(item.committer, commit.committer),
+          authored = commit_date(commit.author), committed = commit_date(commit.committer),
+          message = commit.message:match("[^\r\n]+") or "(no message)",
+        }
+      end
+      local previous = timeline.commits[timeline.selected]
+      timeline.selected = 1
+      for i = #commits, 1, -1 do
+        local c = commits[i]
+        rows[#rows + 1] = {c.committed, c.author, c.message, c.sha:sub(1, 8)}
+      end
+      local reversed = {}
+      for i = #commits, 1, -1 do
+        local c = commits[i]
+        reversed[#reversed + 1] = c
+        if previous and previous.sha == c.sha then timeline.selected = #reversed end
+      end
+      timeline.commits, timeline.rows = reversed, rows
+    end)
+  end
+  timeline.refresh = refresh
+  ttt.open_tab({id = id, title = "Timeline · PR #" .. pr.number,
+    on_close = function() if state.timeline_tabs[id] == timeline then state.timeline_tabs[id] = nil end end,
+    render = function(p)
+      p:hstack({height = 1, gap = 1, padding_left = 1, padding_right = 1, render = function(row)
+        row:label({text = "Timeline · " .. pr.repo .. " #" .. pr.number, style = "bold"})
+        row:button({label = "Refresh", disabled = timeline.loading, on_click = refresh})
+      end})
+      p:label({text = #timeline.commits .. " commits · Newest first", style = "muted", padding_left = 1})
+      p:divider()
+      if timeline.error ~= "" then
+        p:label({text = timeline.error, style = "danger", padding_left = 1})
+        if #timeline.commits > 0 then
+          p:label({text = "Showing previously loaded commits.", style = "muted", padding_left = 1})
+        end
+      end
+      if #timeline.commits >= 250 then
+        p:label({text = "GitHub limits this list to 250 commits.", style = "muted", padding_left = 1})
+      end
+      p:table({columns = {
+          {label = "Date", width = 23}, {label = "Author", width = 16},
+          {label = "Message", min_width = 32}, {label = "Hash", width = 8},
+        }, rows = timeline.rows, selected = timeline.selected, loading = timeline.loading, inset = 1,
+        empty = timeline.error ~= "" and "Commits unavailable." or "No commits in this pull request.",
+        on_select = function(index) timeline.selected = index end,
+      })
+      local selected = timeline.commits[timeline.selected]
+      if selected then
+        p:divider()
+        p:label({text = selected.sha, style = "code", padding_left = 1})
+        p:label({text = "Author: " .. selected.author .. " · " .. selected.authored, style = "muted", padding_left = 1})
+        p:label({text = "Committer: " .. selected.committer .. " · " .. selected.committed, style = "muted", padding_left = 1})
+      end
+    end,
+  })
+  refresh()
+end
+
 open_pr = function(number)
   if review and review.busy then return end
   if not ttt.open_changes then fail("Rebuild ttt with the draft open_changes API"); return end
@@ -160,6 +365,9 @@ open_pr = function(number)
       state.opening = nil
       state.current = {repo = repo, number = number, title = pr.title, sha = pr.head.sha, tab = id,
         comments = (tonumber(pr.comments) or 0) + (tonumber(pr.review_comments) or 0)}
+      local id = "ci:" .. repo .. "#" .. number .. ":" .. pr.head.sha
+      state.current.ci = state.ci_tabs[id] or {id = id, repo = repo, sha = pr.head.sha, jobs = {}, errors = {}}
+      refresh_ci(state.current.ci)
     end)
   end)
 end
@@ -468,7 +676,7 @@ ttt.register({
 		icon = { plain = "⑂", nerd = "\238\169\164" },
     render = function(p)
       sidebar = p
-      p:hstack({height = 1, gap = 1, render = function(row)
+      p:hstack({height = 1, gap = 1, padding_left = 1, padding_right = 1, render = function(row)
         row:input({value = state.url, placeholder = "https://github.com/owner/repo...", autofocus = true,
           on_change = function(text) state.url = text end,
           on_submit = function() load_prs() end})
@@ -490,19 +698,27 @@ ttt.register({
           row:dropdown({label = "⋮", entries = {
             {label = "Comments", command = "comments"},
             {label = "Review", command = "review"},
+            {label = "CI", command = "ci"},
+            {label = "Timeline", command = "timeline"},
             {separator = true},
             {label = "Save repository", command = "save-repository"},
           }, on_menu = function(command)
             if command == "comments" then open_comments()
             elseif command == "review" then open_review()
+            elseif command == "ci" then open_ci()
+            elseif command == "timeline" then open_timeline()
             elseif command == "save-repository" then save_repository() end
           end})
         end})
-        p:hstack({height = 1, gap = 1, render = function(row)
+        p:hstack({height = 1, gap = 1, padding_left = 1, padding_right = 1, render = function(row)
+          row:button({label = " " .. state.current.comments, padding_left = 1, padding_right = 1, on_click = open_comments})
+          row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_timeline})
+          row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_ci})
+          for _, count in ipairs(ci_counts(state.current.ci)) do
+            row:label({text = count.text, style = count.style, width = ttt_text.width(count.text)})
+          end
           row:label("")
-          row:button({label = "Comments (" .. state.current.comments .. ")", padding_left = 2, padding_right = 2,
-            on_click = open_comments})
-          row:button({label = "Review", padding_left = 2, padding_right = 2, on_click = open_review})
+          row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_review})
         end})
         p:divider()
       end
@@ -561,6 +777,20 @@ ttt.register({
     {id = "pr-review.show", title = "PR Review: Show", handler = function() ttt.focus_panel("sidebar") end},
     {id = "pr-review.load", title = "PR Review: Load", handler = function() load_prs() end},
     {id = "pr-review.review", title = "PR Review: Review", handler = open_review},
+    {id = "pr-review.ci", title = "PR Review: CI", handler = open_ci},
+    {id = "pr-review.timeline", title = "PR Review: Timeline", handler = open_timeline},
     {id = "pr-review.comments", title = "PR Review: Comments", handler = open_comments},
   },
 })
+
+ttt.set_interval(30000, function()
+  local seen = {}
+  if state.current then
+    local ci = state.current.ci
+    seen[ci] = true
+    refresh_ci(ci)
+  end
+  for _, ci in pairs(state.ci_tabs) do
+    if not seen[ci] then refresh_ci(ci) end
+  end
+end)
