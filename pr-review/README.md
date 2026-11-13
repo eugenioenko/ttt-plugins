@@ -39,8 +39,9 @@ that limit when reached. Authors and committers come from commit metadata; GitHu
 commit list does not identify the person who pushed each commit.
 
 The action order is Comments (**** with its count), Timeline (****), CI (****
-with separate colored counts), then right-aligned **Review**. The three icons use
-Nerd Fonts, and every action button has one column of left/right padding. All four actions share one row;
+with separate colored counts), then right-aligned **Review ()**. All four icons use
+Nerd Fonts. Every action button has one column of left/right padding, with
+one-column gaps between actions. All four actions share one row;
 widen the sidebar to see the full row, or use its **⋮** menu or command palette.
 
 It lists up to 100 open PRs. The plugin is pending the core API changes linked in its pull request.

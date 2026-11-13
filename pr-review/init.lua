@@ -710,16 +710,15 @@ ttt.register({
             elseif command == "save-repository" then save_repository() end
           end})
         end})
-        p:hstack({height = 1, padding_left = 1, padding_right = 1, render = function(row)
+        p:hstack({height = 1, gap = 1, padding_left = 1, padding_right = 1, render = function(row)
           row:button({label = " " .. state.current.comments, padding_left = 1, padding_right = 1, on_click = open_comments})
           row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_timeline})
           row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_ci})
-          for i, count in ipairs(ci_counts(state.current.ci)) do
-            local text = (i > 1 and " " or "") .. count.text
-            row:label({text = text, style = count.style, width = ttt_text.width(text)})
+          for _, count in ipairs(ci_counts(state.current.ci)) do
+            row:label({text = count.text, style = count.style, width = ttt_text.width(count.text)})
           end
           row:label("")
-          row:button({label = "Review", padding_left = 1, padding_right = 1, on_click = open_review})
+          row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_review})
         end})
         p:divider()
       end
