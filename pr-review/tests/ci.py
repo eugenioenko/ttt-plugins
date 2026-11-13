@@ -44,12 +44,12 @@ else:
 '''
 
 
-def run(binary, scenario):
+def run(binary, scenario, sidebar_width=65):
     with tempfile.TemporaryDirectory(prefix="ttt-ci-") as tmp:
         root = Path(tmp)
         config = root / "config"
         config.mkdir()
-        (config / "state.json").write_text(json.dumps({"sidebarWidth": 65}))
+        (config / "state.json").write_text(json.dumps({"sidebarWidth": sidebar_width}))
         fake = root / "gh"
         fake.write_text("#!" + sys.executable + "\n" + FAKE_GH)
         fake.chmod(0o755)

@@ -190,16 +190,17 @@ local function refresh_ci(ci)
   end
 end
 
-local function ci_spans(ci)
-  if not ci or not ci.loaded then return {{text = "CI …", style = "muted"}} end
-  if #ci.errors > 0 then return {{text = "CI !", style = "danger"}} end
+local function ci_counts(ci)
+  if not ci or not ci.loaded then return {{text = "…", style = "muted"}} end
+  if #ci.errors > 0 then return {{text = "!", style = "danger"}} end
   local c = ci.counts
-  local spans = {
-    {text = "CI "}, {text = tostring(c.passed), style = "success"},
-    {text = " " .. c.pending, style = "warning"}, {text = " " .. c.failed, style = "danger"},
+  local counts = {
+    {text = tostring(c.passed), style = "success"},
+    {text = tostring(c.pending), style = "warning"},
+    {text = tostring(c.failed), style = "danger"},
   }
-  if c.skipped > 0 then spans[#spans + 1] = {text = " " .. c.skipped, style = "muted"} end
-  return spans
+  if c.skipped > 0 then counts[#counts + 1] = {text = tostring(c.skipped), style = "muted"} end
+  return counts
 end
 
 local function open_ci()
@@ -710,14 +711,14 @@ ttt.register({
           end})
         end})
         p:hstack({height = 1, gap = 1, padding_left = 1, padding_right = 1, render = function(row)
-          row:button({label = "Comments (" .. state.current.comments .. ")", padding_left = 2, padding_right = 2,
-            on_click = open_comments})
-          local spans, label = ci_spans(state.current.ci), ""
-          for _, span in ipairs(spans) do label = label .. span.text end
-          row:button({label = label, spans = spans, padding_left = 1, padding_right = 1, on_click = open_ci})
-          row:button({label = "Timeline", padding_left = 1, padding_right = 1, on_click = open_timeline})
+          row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_comments})
+          row:button({label = "CI", padding_left = 0, padding_right = 0, on_click = open_ci})
+          for _, count in ipairs(ci_counts(state.current.ci)) do
+            row:label({text = count.text, style = count.style, width = ttt_text.width(count.text)})
+          end
+          row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_timeline})
           row:label("")
-          row:button({label = "Review", padding_left = 2, padding_right = 2, on_click = open_review})
+          row:button({label = "Review", padding_left = 1, padding_right = 1, on_click = open_review})
         end})
         p:divider()
       end

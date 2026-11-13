@@ -3,7 +3,7 @@
 Run **PR Review: Show**. Enter a GitHub repository URL, `owner/repo`, or a pull request URL, then
 choose **Load**. Activate a PR to open its description and multi-file diff in
 ttt's native detail view. The header's **⋮** switches between open and closed PRs.
-**Comments (N)** opens a tab with discussion comments, review messages, and inline
+**Comments ()** opens a tab with discussion comments, review messages, and inline
 review threads. Each is a collapsible row tagged `Comment`, `Open` or `Resolved`;
 only open threads start expanded, with **Reply** and **Resolve** buttons when GitHub
 allows them. **Expand all** opens every row. Choose **Review** in the sidebar to write a comment
@@ -21,15 +21,15 @@ Reviews target the displayed commit. A changed head requires reopening the PR,
 and merges are pinned to that reviewed SHA. A failed merge can be retried
 without submitting another approval.
 
-The **CI X Y Z** button shows passed (green), pending/running (warning color), and
+The **CI** button opens the jobs tab. Separate counts beside it show passed
+(green), pending/running (warning color), and
 failed (red) counts; a fourth muted count also appears for skipped, neutral, or cancelled
 jobs. It opens a CI tab with each job's icon, name, and status. Checks and external
 commit statuses are fetched for the opened PR's commit, refreshed every 30 seconds
 while that PR is selected or its CI tab remains open. **Refresh** updates immediately.
 Reopen the PR after a new push to review its new commit. **CI !** means status could
 not be loaded completely; open the tab for the error and any available jobs.
-Colored counts require a ttt build supporting button `spans` (older builds show
-the same text without individual colors).
+Counts use ordinary styled labels and need no styled-button API.
 
 **Timeline** lists the PR’s commits, newest first, with author, commit time, short
 hash, and message. Select a row to see the full hash and author/committer details.
@@ -38,7 +38,8 @@ too. GitHub returns at most 250 commits through this endpoint, and the tab marks
 that limit when reached. Authors and committers come from commit metadata; GitHub’s
 commit list does not identify the person who pushed each commit.
 
-All four actions share one row;
+Comments (****) and Timeline (****) use Nerd Font icons. Review remains text,
+aligned to the right. All four actions share one row;
 widen the sidebar to see the full row, or use its **⋮** menu or command palette.
 
 It lists up to 100 open PRs. The plugin is pending the core API changes linked in its pull request.
