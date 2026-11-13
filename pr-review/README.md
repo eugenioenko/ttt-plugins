@@ -21,12 +21,34 @@ Reviews target the displayed commit. A changed head requires reopening the PR,
 and merges are pinned to that reviewed SHA. A failed merge can be retried
 without submitting another approval.
 
+The **CI X Y Z** button shows passed (green), pending/running (warning color), and
+failed (red) counts; a fourth muted count also appears for skipped, neutral, or cancelled
+jobs. It opens a CI tab with each job's icon, name, and status. Checks and external
+commit statuses are fetched for the opened PR's commit, refreshed every 30 seconds
+while that PR is selected or its CI tab remains open. **Refresh** updates immediately.
+Reopen the PR after a new push to review its new commit. **CI !** means status could
+not be loaded completely; open the tab for the error and any available jobs.
+Colored counts require a ttt build supporting button `spans` (older builds show
+the same text without individual colors).
+
+**Timeline** lists the PR’s commits, newest first, with author, commit time, short
+hash, and message. Select a row to see the full hash and author/committer details.
+**Refresh** fetches the latest list; reopening an existing Timeline tab refreshes it
+too. GitHub returns at most 250 commits through this endpoint, and the tab marks
+that limit when reached. Authors and committers come from commit metadata; GitHub’s
+commit list does not identify the person who pushed each commit.
+
+All four actions share one row;
+widen the sidebar to see the full row, or use its **⋮** menu or command palette.
+
 It lists up to 100 open PRs. The plugin is pending the core API changes linked in its pull request.
 
 Run the real-binary smoke checks with:
 
 ```sh
 python3 tests/smoke.py /path/to/ttt/bin/ttt
+python3 tests/ci.py /path/to/ttt/bin/ttt
+python3 tests/timeline.py /path/to/ttt/bin/ttt
 ```
 
 These use an isolated configuration and a fake `gh` executable, so they do not
