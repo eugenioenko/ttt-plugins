@@ -60,16 +60,16 @@ def run(binary, scenario, sidebar_width=65):
         screen = artifact / (scenario + ".txt")
         script = ['exec "PR Review: Show"', 'type https://github.com/example/repo/pull/7',
                   'key Enter', 'wait-for "PR #7: CI fixture"']
-        summary = {"empty": "CI 0 0 0", "error": "CI !", "invalid": "CI !"}.get(scenario, "CI 2 2 3 3")
+        summary = {"empty": " 0 0 0", "error": " !", "invalid": " !"}.get(scenario, " 2 2 3 3")
         script += ['wait-for "' + summary + '"', 'screenshot ' + str(artifact / (scenario + '-button.txt')),
                    'exec "PR Review: CI"', 'wait-for "CI · example/repo #7"']
         expected = {"empty": "No CI jobs reported", "error": "Checks unavailable",
                     "invalid": "GitHub returned invalid JSON"}.get(scenario, "External CI")
         script += ['wait-for "' + expected + '"']
         if scenario == "refresh":
-            script += ['wait-for "Ready to refresh"', 'key Enter', 'wait-for Finished', 'wait-for "CI 2 0 0"']
+            script += ['wait-for "Ready to refresh"', 'key Enter', 'wait-for Finished', 'wait-for " 2 0 0"']
         if scenario == "poll":
-            script += ['wait-for Finished timeout=35000', 'wait-for "CI 2 0 0"']
+            script += ['wait-for Finished timeout=35000', 'wait-for " 2 0 0"']
         script += ['screenshot ' + str(screen), 'quit']
         result = subprocess.run([binary, '--size', '160x40', '--plugin',
                                  str(Path(__file__).resolve().parents[1] / 'init.lua'),
