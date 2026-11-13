@@ -7,8 +7,8 @@
       "locale": "th",
       "name": "ไทย",
       "path": "messages.json",
-      "sourceCommit": "b51ae983e0f60599090e0b0061093dbece9b541f",
-      "tttVersion": "dev"
+      "sourceCommit": "b006662f1b8594da4f7bf0fafd43db86fb9eed9f",
+      "tttVersion": "v1.12.0"
     }
   ],
   "name": "ttt-i18n-th",
