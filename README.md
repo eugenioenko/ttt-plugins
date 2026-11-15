@@ -95,6 +95,15 @@ Language packs translate the core interface. Requires TTT 1.12.0 or later. Insta
 | [ttt-i18n-zh-cn](ttt-i18n-zh-cn/) | Simplified Chinese (mainland China) — 简体中文 |
 | [ttt-i18n-zh-tw](ttt-i18n-zh-tw/) | Traditional Chinese (Taiwan) — 繁體中文 |
 
+## Themes
+
+Theme plugins contribute color themes without Lua or filesystem permissions. Requires ttt with manifest theme contributions (eugenioenko/ttt#1246). After installation, select the theme with **Switch Theme**.
+
+| Plugin | Theme |
+|--------|-------|
+| [theme-tokyo-neon](theme-tokyo-neon/) | Tokyo Neon |
+| [theme-vermeer](theme-vermeer/) | Vermeer |
+
 ## LSP Servers
 
 LSP plugins auto-configure language servers via the `lsp.servers` setting. Install the plugin and server binary to enable supported LSP features; see each plugin's README for capabilities and limitations.

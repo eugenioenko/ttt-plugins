@@ -1,0 +1,13 @@
+{
+  "name": "theme-tokyo-neon",
+  "displayName": "Tokyo Neon Theme",
+  "description": "Tokyo Neon color theme for ttt",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "api": 2,
+  "themes": [
+    {
+      "path": "themes/tokyo-neon.json"
+    }
+  ]
+}
