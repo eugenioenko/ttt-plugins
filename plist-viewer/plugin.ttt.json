@@ -1,0 +1,15 @@
+{
+  "name": "plist-viewer",
+  "displayName": "PLIST Viewer",
+  "description": "Open macOS/iOS binary property lists as an interactive two-column tree",
+  "version": "0.1.0",
+  "author": "danielmrdev",
+  "entry": "plugin.lua",
+  "api": 1,
+  "permissions": {
+    "editor.file_handlers": true,
+    "fs.read": ["*"],
+    "events.file": true,
+    "events.editor": true
+  }
+}
