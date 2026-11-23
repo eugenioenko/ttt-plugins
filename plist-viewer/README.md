@@ -9,6 +9,16 @@ by a pure-Lua parser with no external tools.
 XML plists are plain text and keep opening as normal editor tabs; only binary
 plists are intercepted.
 
+## Install
+
+Once the community registry entry is available, install from ttt's Plugins
+panel (search `plist-viewer`). Until then, copy the plugin manually and
+restart ttt:
+
+```sh
+cp -r plist-viewer ~/.config/ttt/plugins/
+```
+
 ## Layout
 
 - Keys form a fixed column (sized per file from the widest key), values start

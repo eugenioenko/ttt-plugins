@@ -15,6 +15,7 @@
 local ttt = require("ttt")
 local fs = require("ttt.fs")
 local text = require("ttt.text")
+local text_truncate = text.truncate -- clean()'s parameter shadows the module
 local events = require("ttt.events")
 
 -- ── byte readers (1-based offsets; Lua strings are byte strings, NUL-safe) ──
@@ -27,17 +28,24 @@ end
 
 local SAFE = 2 ^ 53
 
--- Two's-complement integer of n bytes at i. Returns ("num", value) when exact
--- in a double, else ("hex", "±0x…") so display stays honest past 2^53.
+-- Unsigned big-endian integer of n bytes. Returns ("num", value) when exact
+-- in a double, else ("hex", "0x…") so display stays honest past 2^53.
+local function read_uint(s, i, n)
+	local first = i
+	while first < i + n - 1 and s:byte(first) == 0 do first = first + 1 end
+	local v = be(s, first, i + n - first)
+	if v < SAFE then return "num", v end
+	local hex = string.format("%02X", s:byte(first))
+	for j = first + 1, i + n - 1 do hex = hex .. string.format("%02X", s:byte(j)) end
+	return "hex", "0x" .. hex
+end
+
+-- Binary-plist integers: widths below eight bytes are unsigned; eight and
+-- sixteen are stored two's complement (plistlib: signed = tokenL >= 3).
+-- Returns ("num", value) when exact, else ("hex", "±0x…").
 local function read_int(s, i, n)
-	if s:byte(i) < 0x80 then
-		local first = i
-		while first < i + n - 1 and s:byte(first) == 0 do first = first + 1 end
-		local v = be(s, first, i + n - first)
-		if v < SAFE then return "num", v end
-		local hex = string.format("%02X", s:byte(first))
-		for j = first + 1, i + n - 1 do hex = hex .. string.format("%02X", s:byte(j)) end
-		return "hex", "0x" .. hex
+	if n < 8 or s:byte(i) < 0x80 then
+		return read_uint(s, i, n)
 	end
 	local b = {}
 	for j = 1, n do b[j] = 0xFF - s:byte(i + j - 1) end
@@ -153,12 +161,24 @@ local function decode(data)
 	if offsize < 1 or refsize < 1 or nobjects < 1 or top >= nobjects then
 		return nil, "bad trailer"
 	end
+	if table_off + nobjects * offsize > #data - 32 then
+		return nil, "offset table outside the file"
+	end
+
+	-- Shared refs re-decode per reference, so total materialization is bounded
+	-- across the whole decode, not just nesting depth: a crafted chain of
+	-- arrays referencing earlier objects would otherwise expand exponentially
+	-- on the UI thread.
+	local budget = 100000
 
 	local obj_at, decode_obj
 
 	obj_at = function(idx, depth)
 		if idx >= nobjects then return nil, "object index out of range" end
+		budget = budget - 1
+		if budget < 0 then return nil, "too many objects" end
 		local o = be(data, table_off + idx * offsize + 1, offsize)
+		if o >= table_off then return nil, "object offset out of range" end
 		return decode_obj(o + 1, depth)
 	end
 
@@ -167,12 +187,23 @@ local function decode(data)
 		local m = data:byte(off)
 		local hi = math.floor(m / 16)
 		local lo = m % 16
+		-- Counts and payload extents are validated against the offset table so
+		-- a corrupt length cannot make sub() silently read table metadata as
+		-- content. A payload may end immediately before the table.
+		local function extent(p, bytes)
+			if p + bytes - 1 > #data or p + bytes - 1 > table_off then
+				return nil, "payload crosses the offset table"
+			end
+			return p
+		end
+		-- Extended counts are unsigned (plistlib reads them with B/H/L/Q).
 		local function count(cpos)
 			if lo ~= 0xF then return lo, cpos end
 			local cm = data:byte(cpos)
 			if math.floor(cm / 16) ~= 0x1 then return nil, "expected int marker for count" end
+			if cm % 16 > 3 then return nil, "bad count size" end
 			local n = 2 ^ (cm % 16)
-			local kind, v = read_int(data, cpos + 1, n)
+			local kind, v = read_uint(data, cpos + 1, n)
 			if kind ~= "num" then return nil, "count too large" end
 			return v, cpos + 1 + n
 		end
@@ -193,6 +224,7 @@ local function decode(data)
 		elseif hi == 0x4 then
 			local n, p = count(off + 1)
 			if not n then return nil, p end
+			if not extent(p, n) then return nil, "payload crosses the offset table" end
 			local shown = {}
 			for j = 0, math.min(n, 8) - 1 do shown[#shown + 1] = string.format("%02X", data:byte(p + j)) end
 			return { kind = "data",
@@ -200,13 +232,16 @@ local function decode(data)
 		elseif hi == 0x5 then
 			local n, p = count(off + 1)
 			if not n then return nil, p end
+			if not extent(p, n) then return nil, "payload crosses the offset table" end
 			return { kind = "str", text = data:sub(p, p + n - 1) }
 		elseif hi == 0x6 then
 			local n, p = count(off + 1)
 			if not n then return nil, p end
+			if not extent(p, n * 2) then return nil, "payload crosses the offset table" end
 			return { kind = "str", text = utf16be(data, p, n) }
 		elseif hi == 0x8 then
-			return { kind = "uid", text = "UID " .. string.format("%.0f", be(data, off + 1, lo + 1)) }
+			local kind, v = read_uint(data, off + 1, lo + 1)
+			return { kind = "uid", text = "UID " .. (kind == "num" and string.format("%.0f", v) or v) }
 		elseif hi == 0xA or hi == 0xB or hi == 0xC then
 			local n, p = count(off + 1)
 			if not n then return nil, p end
@@ -258,30 +293,31 @@ local TYPE_ICONS = {
 
 local function clean(text, max)
 	local t = tostring(text):gsub("%c", "·")
-	if #t > max then t = t:sub(1, max) .. "…" end
-	return t
+	-- display-width aware, so clipping stays on a character boundary
+	return text_truncate(t, max, "…")
 end
 
--- Key column width: widest key (display columns) plus a gap, capped. Values
--- start at a constant x for every depth because each label is padded to
--- colw - depth*indent columns.
+-- Key column width: wide enough for the widest key and for the deepest row's
+-- indentation plus a usable prefix, so the value column stays fixed at every
+-- depth and the fit() clamp never applies to a row with a value.
 local function key_col_width(root)
-	local w = 10
-	local function walk(v)
+	local w, maxdepth = 10, 0
+	local function walk(v, depth)
+		if depth > maxdepth then maxdepth = depth end
 		if v.kind == "dict" then
 			for _, e in ipairs(v.entries) do
 				local k = text.width(e.key.text)
 				if k > w then w = k end
-				walk(e.val)
+				walk(e.val, depth + 1)
 			end
 		elseif v.kind == "list" then
 			local idx = #tostring(#v.items) + 2
 			if idx > w then w = idx end
-			for _, c in ipairs(v.items) do walk(c) end
+			for _, c in ipairs(v.items) do walk(c, depth + 1) end
 		end
 	end
-	walk(root)
-	return math.min(40, w + 3)
+	walk(root, 0)
+	return math.min(60, math.max(w + 3, maxdepth * 2 + 12))
 end
 
 -- Truncate-or-pad a key to exactly `avail` display columns so the badge
@@ -328,8 +364,10 @@ local function build_items(viewer)
 					children[#children + 1] = node_item(id, "[" .. (j - 1) .. "]", e, j, true, depth + 1)
 				end
 			end
+			-- expandable keeps the chevron slot for every container, including
+			-- empty ones, so all rows share the same glyph column
 			local node = { id = id, label = keylabel(label, avail), badge = val.text,
-				children = children }
+				expandable = true, children = children }
 			if first and depth < 1 then node.expanded = true end
 			return node
 		end
@@ -361,7 +399,14 @@ local function render_viewer(viewer, panel)
 	local w = panel:size()
 	viewer.value_cap = math.max(20, (w or 120) - viewer.colw - 10)
 	local shown = viewer.path
-	if #shown > 48 then shown = "…" .. shown:sub(#shown - 45) end
+	if #shown > 48 then
+		shown = shown:sub(#shown - 45)
+		-- the byte slice can start inside a UTF-8 sequence: back up to its head
+		while shown:byte(1) and shown:byte(1) >= 0x80 and shown:byte(1) <= 0xBF do
+			shown = shown:sub(2)
+		end
+		shown = "…" .. shown
+	end
 	panel:label({ text = shown .. " · bplist00 · " .. viewer.stats.objects .. " objects",
 		style = "muted" })
 	panel:tree({
