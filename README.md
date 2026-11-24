@@ -17,6 +17,7 @@ Community plugins for the [ttt terminal text editor](https://github.com/eugenioe
 | [notepad](notepad/) | Scratchpad for quick notes | |
 | [omarchy-theme](omarchy-theme/) | Generate a TTT theme snapshot from the active Omarchy palette | [@danielmrdev](https://github.com/danielmrdev) |
 | [pdf-viewer](https://github.com/sercanatalik/ttt-pdf) | View and search PDFs in an editor tab, with fit width and auto-reload | [@sercanatalik](https://github.com/sercanatalik) |
+| [plist-viewer](plist-viewer/) | Binary plist (bplist00) tree viewer for macOS/iOS files ([manual install](plist-viewer/#install) until available in the registry) | [@danielmrdev](https://github.com/danielmrdev) |
 | [port-finder](port-finder/) | Find and kill processes listening on TCP ports | |
 | [pr-review](pr-review/) | Browse GitHub pull requests, read comments, and submit reviews or approvals |
 | [terminal-theme](terminal-theme/) | Generate a TTT theme snapshot from the running terminal's palette | [@danielmrdev](https://github.com/danielmrdev) |
