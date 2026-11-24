@@ -176,16 +176,27 @@ local function decode(data)
 	-- on the UI thread.
 	local budget = 100000
 	local string_budget = 3 * 1024 * 1024
+	-- Each object index decodes once, like plistlib's object table: shared
+	-- references reuse the decoded value, so the string budget charges each
+	-- string a single time and a legitimately repeated string cannot exhaust
+	-- it. Only completed objects memoize; a crafted reference cycle instead
+	-- recurses until the depth guard rejects it.
+	local memo = {}
 
 	local obj_at, decode_obj
 
 	obj_at = function(idx, depth)
 		if idx >= nobjects then return nil, "object index out of range" end
+		local hit = memo[idx]
+		if hit ~= nil then return hit end
 		budget = budget - 1
 		if budget < 0 then return nil, "too many objects" end
 		local o = be(data, table_off + idx * offsize + 1, offsize)
 		if o >= table_off then return nil, "object offset out of range" end
-		return decode_obj(o + 1, depth)
+		local v, err = decode_obj(o + 1, depth)
+		if not v then return nil, err end
+		memo[idx] = v
+		return v
 	end
 
 	decode_obj = function(off, depth)
@@ -349,14 +360,24 @@ end
 -- reconciles expansion by node ID. `expanded` is asserted only on the FIRST
 -- build (initial defaults); re-asserting it on later builds would re-expand
 -- nodes the user has collapsed.
+local ITEM_BUDGET = 100000
+
 local function build_items(viewer)
 	local first = not viewer.built
 	viewer.built = true
 	local colw = viewer.colw
 	local vcap = viewer.value_cap or 60
+	-- With memoized decode, a chain of shared references is cheap to decode
+	-- but still expands per reference here, so materialized rows are bounded
+	-- too. The error surfaces through the pcall in render_viewer.
+	local budget = ITEM_BUDGET
 	local function node_item(pid, label, val, idx, muted, depth)
+		budget = budget - 1
+		if budget < 0 then error("too many items") end
 		local id = pid .. "/" .. idx .. ":" .. label
-		local avail = colw - depth * INDENT - prefix_width(val)
+		-- The floor keeps avail positive when absurd nesting outruns the
+		-- colw cap, so text.truncate never receives a negative width.
+		local avail = math.max(4, colw - depth * INDENT - prefix_width(val))
 		local icon = TYPE_ICONS[val.kind] or ""
 		if val.kind == "dict" or val.kind == "list" then
 			local children = {}
@@ -413,8 +434,13 @@ local function render_viewer(viewer, panel)
 	end
 	panel:label({ text = shown .. " · bplist00 · " .. viewer.stats.objects .. " objects",
 		style = "muted" })
+	local ok, items = pcall(build_items, viewer)
+	if not ok then
+		panel:label({ text = "decode failed: " .. tostring(items), style = "danger" })
+		return
+	end
 	panel:tree({
-		items = build_items(viewer),
+		items = items,
 		indent = INDENT,
 	})
 end
