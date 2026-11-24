@@ -8,6 +8,8 @@ Install [Delve](https://github.com/go-delve/delve) with `go install github.com/g
 
 ## Launch a program
 
+**Debug File** launches the package containing the active Go file. For a `_test.go` file it runs the package in test mode.
+
 Open a Go module with a main package at its root. Save this target in `.ttt/launch.json`, set a gutter breakpoint, and select **Run & Debug** in the Debug sidebar.
 
 ```json

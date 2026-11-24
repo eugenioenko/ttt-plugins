@@ -5,6 +5,7 @@ local adapter = {
   provider = "debugpy",
   command = {"${python}", "-m", "debugpy.adapter"},
   transport = "stdio",
+  fileLaunch = {program = "${file}"},
   languages = {"python"},
 }
 local keys = {"debug.adapters.debugpy"}

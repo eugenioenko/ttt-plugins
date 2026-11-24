@@ -6,6 +6,10 @@ local adapter = {
   command = {"dlv", "dap", "--listen=unix:${socket}"},
   transport = "listen",
   addressPattern = "^DAP server listening at: (.+)$",
+  fileLaunch = {program = "${fileDirname}"},
+  fileLaunchOverrides = {
+    {pattern = "*_test.go", arguments = {mode = "test"}},
+  },
   languages = {"go"},
 }
 local keys = {"debug.adapters.go"}

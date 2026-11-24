@@ -8,6 +8,8 @@ Install Node.js and the [standalone js-debug distribution](https://github.com/mi
 
 ## Launch a program
 
+**Debug File** launches the active file with Node. Use a saved target if your project needs a loader or compiled JavaScript entry point.
+
 Use an existing JavaScript entry point. For TypeScript, compile with source maps and point `program` to the emitted JavaScript. Save this target in `.ttt/launch.json`, set a gutter breakpoint, and select **Run & Debug** in the Debug sidebar.
 
 ```json

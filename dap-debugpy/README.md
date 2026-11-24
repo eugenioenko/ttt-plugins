@@ -8,6 +8,8 @@ Install [debugpy](https://github.com/microsoft/debugpy) in the interpreter used 
 
 ## Launch a program
 
+**Debug File** launches the active Python file using the configured interpreter.
+
 Use an existing Python entry point. Save this target in `.ttt/launch.json`, set a gutter breakpoint, and select **Run & Debug** in the Debug sidebar.
 
 ```json

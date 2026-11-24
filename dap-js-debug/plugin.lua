@@ -6,6 +6,7 @@ local adapter = {
   command = {"js-debug-adapter", ttt.platform() == "windows" and "0" or "${socket}", "127.0.0.1"},
   transport = "listen",
   addressPattern = "^Debug server listening at (.+)$",
+  fileLaunch = {program = "${file}"},
   languages = {"javascript", "javascriptreact", "typescript", "typescriptreact"},
 }
 local keys = {"debug.adapters.node", "debug.adapters.pwa-node"}
