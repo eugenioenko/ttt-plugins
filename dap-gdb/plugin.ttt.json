@@ -10,7 +10,6 @@
     "settings": true,
     "settings_keys": [
       "debug.adapters.gdb"
-    ],
-    "storage": true
+    ]
   }
 }

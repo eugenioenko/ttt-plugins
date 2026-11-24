@@ -10,7 +10,6 @@
     "settings": true,
     "settings_keys": [
       "debug.adapters.debugpy"
-    ],
-    "storage": true
+    ]
   }
 }
