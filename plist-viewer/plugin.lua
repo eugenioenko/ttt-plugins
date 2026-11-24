@@ -15,7 +15,6 @@
 local ttt = require("ttt")
 local fs = require("ttt.fs")
 local text = require("ttt.text")
-local text_truncate = text.truncate -- clean()'s parameter shadows the module
 local events = require("ttt.events")
 
 -- ── byte readers (1-based offsets; Lua strings are byte strings, NUL-safe) ──
@@ -108,7 +107,7 @@ end
 -- n UTF-16BE code units starting at 1-based byte offset i (surrogate pairs
 -- decode to one char but consume two units — the count is in units, not chars)
 local function utf16be(s, i, n)
-	local out, pos, used = {}, i, 0
+	local out, chunk, pos, used = {}, {}, i, 0
 	while used < n do
 		local cp = s:byte(pos) * 256 + s:byte(pos + 1)
 		pos = pos + 2
@@ -121,8 +120,14 @@ local function utf16be(s, i, n)
 				cp = 0x10000 + (cp - 0xD800) * 0x400 + (lo - 0xDC00)
 			end
 		end
-		out[#out + 1] = utf8_encode(cp)
+		chunk[#chunk + 1] = utf8_encode(cp)
+		-- Large table.concat calls can exhaust the host Lua VM's registry.
+		if #chunk == 1024 then
+			out[#out + 1] = table.concat(chunk)
+			chunk = {}
+		end
 	end
+	out[#out + 1] = table.concat(chunk)
 	return table.concat(out)
 end
 
@@ -170,6 +175,7 @@ local function decode(data)
 	-- arrays referencing earlier objects would otherwise expand exponentially
 	-- on the UI thread.
 	local budget = 100000
+	local string_budget = 3 * 1024 * 1024
 
 	local obj_at, decode_obj
 
@@ -229,16 +235,17 @@ local function decode(data)
 			for j = 0, math.min(n, 8) - 1 do shown[#shown + 1] = string.format("%02X", data:byte(p + j)) end
 			return { kind = "data",
 				text = n .. " B  " .. table.concat(shown, " ") .. (n > 8 and " …" or "") }
-		elseif hi == 0x5 then
+		elseif hi == 0x5 or hi == 0x6 then
 			local n, p = count(off + 1)
 			if not n then return nil, p end
-			if not extent(p, n) then return nil, "payload crosses the offset table" end
+			local utf16 = hi == 0x6
+			if not extent(p, utf16 and n * 2 or n) then return nil, "payload crosses the offset table" end
+			-- Charge every reference before copying or converting it. A UTF-16
+			-- code unit can contribute up to three bytes of UTF-8.
+			string_budget = string_budget - (utf16 and n * 3 or n)
+			if string_budget < 0 then return nil, "decoded strings exceed the 3 MiB budget" end
+			if utf16 then return { kind = "str", text = utf16be(data, p, n) } end
 			return { kind = "str", text = data:sub(p, p + n - 1) }
-		elseif hi == 0x6 then
-			local n, p = count(off + 1)
-			if not n then return nil, p end
-			if not extent(p, n * 2) then return nil, "payload crosses the offset table" end
-			return { kind = "str", text = utf16be(data, p, n) }
 		elseif hi == 0x8 then
 			local kind, v = read_uint(data, off + 1, lo + 1)
 			return { kind = "uid", text = "UID " .. (kind == "num" and string.format("%.0f", v) or v) }
@@ -291,39 +298,39 @@ local TYPE_ICONS = {
 	null = "\239\132\145", -- U+F111 circle
 }
 
-local function clean(text, max)
-	local t = tostring(text):gsub("%c", "·")
-	-- display-width aware, so clipping stays on a character boundary
-	return text_truncate(t, max, "…")
+local function clean(value, max)
+	local t = tostring(value):gsub("%c", "·")
+	return text.truncate(t, max, "…")
 end
 
--- Key column width: wide enough for the widest key and for the deepest row's
--- indentation plus a usable prefix, so the value column stays fixed at every
--- depth and the fit() clamp never applies to a row with a value.
+local INDENT = 2
+
+local function prefix_width(val)
+	if val.kind == "dict" or val.kind == "list" then return 2 end
+	return text.width(TYPE_ICONS[val.kind]) + 1
+end
+
 local function key_col_width(root)
-	local w, maxdepth = 10, 0
-	local function walk(v, depth)
-		if depth > maxdepth then maxdepth = depth end
+	local w = 15
+	local function walk(v, depth, label)
+		local prefix = depth * INDENT + prefix_width(v)
+		w = math.max(w, prefix + 4, math.min(60, prefix + text.width(label) + 3))
+		depth = depth + 1
 		if v.kind == "dict" then
 			for _, e in ipairs(v.entries) do
-				local k = text.width(e.key.text)
-				if k > w then w = k end
-				walk(e.val, depth + 1)
+				walk(e.val, depth, clean(e.key.text, 40))
 			end
 		elseif v.kind == "list" then
-			local idx = #tostring(#v.items) + 2
-			if idx > w then w = idx end
-			for _, c in ipairs(v.items) do walk(c, depth + 1) end
+			for j, c in ipairs(v.items) do walk(c, depth, "[" .. (j - 1) .. "]") end
 		end
 	end
-	walk(root, 0)
-	return math.min(60, math.max(w + 3, maxdepth * 2 + 12))
+	walk(root, -1, "")
+	return w
 end
 
 -- Truncate-or-pad a key to exactly `avail` display columns so the badge
 -- (the value) that follows it lands on the shared value column.
 local function fit(label, avail)
-	if avail < 1 then return label end
 	local s = text.truncate(label, avail, "…")
 	local w = text.width(s)
 	if w < avail then s = s .. string.rep(" ", avail - w) end
@@ -334,7 +341,6 @@ end
 -- constant x: label still measures `avail`, so the value column holds.
 local SEP = "\226\148\130"
 local function keylabel(key, avail)
-	if avail < 4 then return fit(key, avail) end
 	return fit(key, avail - 1) .. SEP
 end
 
@@ -350,8 +356,7 @@ local function build_items(viewer)
 	local vcap = viewer.value_cap or 60
 	local function node_item(pid, label, val, idx, muted, depth)
 		local id = pid .. "/" .. idx .. ":" .. label
-		local avail = colw - depth * 2
-		if avail < 1 then avail = 1 end
+		local avail = colw - depth * INDENT - prefix_width(val)
 		local icon = TYPE_ICONS[val.kind] or ""
 		if val.kind == "dict" or val.kind == "list" then
 			local children = {}
@@ -374,7 +379,7 @@ local function build_items(viewer)
 		local v = val.text
 		if val.kind == "str" and v == "" then v = '""' end
 		return { id = id, icon = icon, icon_style = "muted", label = keylabel(label, avail),
-			badge = text.truncate(v, vcap, "…"), muted = muted }
+			badge = clean(v, vcap), muted = muted }
 	end
 
 	local items = {}
@@ -388,8 +393,7 @@ local function build_items(viewer)
 			items[#items + 1] = node_item("r", "[" .. (j - 1) .. "]", v, j, true, 0)
 		end
 	else
-		items[#items + 1] = { id = "r/1:root", icon = TYPE_ICONS[root.kind] or "",
-			icon_style = "muted", label = keylabel("root", colw), badge = clean(root.text, 72) }
+		items[#items + 1] = node_item("r", "root", root, 1, false, 0)
 	end
 	return items
 end
@@ -401,7 +405,7 @@ local function render_viewer(viewer, panel)
 	local shown = viewer.path
 	if #shown > 48 then
 		shown = shown:sub(#shown - 45)
-		-- the byte slice can start inside a UTF-8 sequence: back up to its head
+		-- Skip any continuation bytes left at the start of the slice.
 		while shown:byte(1) and shown:byte(1) >= 0x80 and shown:byte(1) <= 0xBF do
 			shown = shown:sub(2)
 		end
@@ -411,7 +415,7 @@ local function render_viewer(viewer, panel)
 		style = "muted" })
 	panel:tree({
 		items = build_items(viewer),
-		indent = 2,
+		indent = INDENT,
 	})
 end
 
