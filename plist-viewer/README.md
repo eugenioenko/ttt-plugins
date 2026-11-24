@@ -16,6 +16,8 @@ panel (search `plist-viewer`). Until then, copy the plugin manually and
 restart ttt:
 
 ```sh
+git clone https://github.com/eugenioenko/ttt-plugins
+cd ttt-plugins
 plugins_dir="${TTT_CONFIG_DIR:-$HOME/.config/ttt}/plugins"
 mkdir -p "$plugins_dir" && cp -r plist-viewer "$plugins_dir/"
 ```
