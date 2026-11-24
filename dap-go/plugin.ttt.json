@@ -1,0 +1,16 @@
+{
+  "name": "dap-go",
+  "displayName": "Delve Debug Adapter",
+  "description": "Configure Delve for Go debugging",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "api": 1,
+  "permissions": {
+    "settings": true,
+    "settings_keys": [
+      "debug.adapters.go"
+    ],
+    "storage": true
+  }
+}

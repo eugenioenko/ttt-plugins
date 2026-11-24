@@ -96,6 +96,16 @@ Language packs translate the core interface. Requires TTT 1.12.0 or later. Insta
 | [ttt-i18n-zh-cn](ttt-i18n-zh-cn/) | Simplified Chinese (mainland China) — 简体中文 |
 | [ttt-i18n-zh-tw](ttt-i18n-zh-tw/) | Traditional Chinese (Taiwan) — 繁體中文 |
 
+## Debug adapters
+
+| Plugin | Languages |
+|---|---|
+| [dap-codelldb](dap-codelldb/) | C, C++, and Rust |
+| [dap-gdb](dap-gdb/) | C and C++ |
+| [dap-go](dap-go/) | Go |
+| [dap-js-debug](dap-js-debug/) | JavaScript and TypeScript |
+| [dap-debugpy](dap-debugpy/) | Python |
+
 ## LSP Servers
 
 LSP plugins auto-configure language servers via the `lsp.servers` setting. Install the plugin and server binary to enable supported LSP features; see each plugin's README for capabilities and limitations.

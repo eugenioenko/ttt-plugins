@@ -1,0 +1,32 @@
+local ttt = require("ttt")
+local settings = require("ttt.settings")
+local storage = require("ttt.storage")
+local json = require("ttt.json")
+
+local adapter = {
+  provider = "jsdebug",
+  command = {"js-debug-adapter", ttt.platform() == "windows" and "0" or "${socket}", "127.0.0.1"},
+  transport = "listen",
+  addressPattern = "^Debug server listening at (.+)$",
+  languages = {"javascript", "javascriptreact", "typescript", "typescriptreact"},
+}
+local keys = {"debug.adapters.node", "debug.adapters.pwa-node"}
+
+ttt.on_install(function()
+  for _, key in ipairs(keys) do
+    if settings.get(key) == nil then
+      settings.set(key, adapter)
+      storage.set(key, json.encode(adapter))
+    end
+  end
+end)
+
+ttt.on_uninstall(function()
+  for _, key in ipairs(keys) do
+    local owned = storage.get(key)
+    if owned and owned == json.encode(settings.get(key)) then
+      settings.set(key, nil)
+    end
+    storage.remove(key)
+  end
+end)
