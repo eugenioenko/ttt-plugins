@@ -1,0 +1,15 @@
+{
+  "name": "dap-php",
+  "displayName": "PHP Debug Adapter",
+  "description": "Debug PHP CLI scripts and incoming Xdebug requests",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "api": 1,
+  "permissions": {
+    "settings": true,
+    "settings_keys": [
+      "debug.adapters.php"
+    ]
+  }
+}

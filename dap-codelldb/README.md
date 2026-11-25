@@ -8,7 +8,7 @@ Download the [CodeLLDB VSIX for your platform](https://github.com/vadimcn/codell
 
 ## Launch a program
 
-Compile your C program with debug symbols, for example `cc -g -O0 main.c -o example`. Save this target in `.ttt/launch.json`, set a gutter breakpoint, and select **Run & Debug** in the Debug sidebar.
+Compile your C program with debug symbols, for example `cc -g -O0 main.c -o example`. For C++, use `c++ -g -O0 main.cpp -o example`. At a breakpoint inside a method, expand `this` in Variables to inspect its members. Save this target in `.ttt/launch.json`, set a gutter breakpoint, and select **Run & Debug** in the Debug sidebar.
 
 ```json
 {

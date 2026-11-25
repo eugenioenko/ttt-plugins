@@ -105,6 +105,9 @@ Language packs translate the core interface. Requires TTT 1.12.0 or later. Insta
 | [dap-go](dap-go/) | Go |
 | [dap-js-debug](dap-js-debug/) | JavaScript and TypeScript |
 | [dap-debugpy](dap-debugpy/) | Python |
+| [dap-lldb-dap](dap-lldb-dap/) | C |
+| [dap-netcoredbg](dap-netcoredbg/) | C# |
+| [dap-php](dap-php/) | PHP |
 
 ## LSP Servers
 
