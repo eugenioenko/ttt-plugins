@@ -7,8 +7,8 @@
       "locale": "el",
       "name": "Ελληνικά",
       "path": "messages.json",
-      "sourceCommit": "b006662f1b8594da4f7bf0fafd43db86fb9eed9f",
-      "tttVersion": "v1.12.0"
+      "sourceCommit": "226d5d4bd4c85a035ded1827ba1d63b49212af73",
+      "tttVersion": "dev"
     }
   ],
   "name": "ttt-i18n-el",
