@@ -773,8 +773,10 @@ ttt.register({
             row:label({text = count.text, style = count.style, width = ttt_text.width(count.text)})
           end
           row:label("")
-          row:button({label = "", padding_left = 1, padding_right = 1, disabled = state.current.status ~= "OPEN", on_click = open_merge})
-          row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_review})
+          local width = p:size()
+          local padding = width >= 36 and 1 or 0
+          row:button({label = "", padding_left = padding, padding_right = padding, disabled = state.current.status ~= "OPEN", on_click = open_merge})
+          row:button({label = "", padding_left = padding, padding_right = padding, on_click = open_review})
         end})
         p:divider()
       end

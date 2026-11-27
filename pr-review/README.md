@@ -47,8 +47,7 @@ commit list does not identify the person who pushed each commit.
 
 The action order is Comments (**** with its count), Timeline (****), CI (****
 with separate colored counts), then right-aligned **Merge ()** and **Review ()**. The icons use
-Nerd Fonts. Every action button has one column of left/right padding, with
-one-column gaps between actions. All five actions share one row;
+Nerd Fonts. Merge and Review use less padding in narrow sidebars. All five actions share one row;
 widen the sidebar to see the full row, or use its **⋮** menu or command palette.
 
 It lists up to 100 open PRs. The plugin is pending the core API changes linked in its pull request.
