@@ -1,7 +1,7 @@
 {
   "name": "pr-review",
   "displayName": "PR Review",
-  "description": "Browse GitHub pull requests, inspect native diffs, and submit reviews.",
+  "description": "Browse GitHub pull requests, inspect native diffs, submit reviews, and merge changes.",
   "version": "0.1.0",
   "author": "eugenioenko",
   "entry": "init.lua",
