@@ -337,14 +337,29 @@ local function open_timeline()
   refresh()
 end
 
+local function update_list_item(number, title, status, is_draft)
+  for i, item in ipairs(state.prs) do
+    if item.number == number then
+      local list_state = status == "OPEN" and "open" or "closed"
+      if not state.single and list_state ~= state.pr_state then
+        table.remove(state.prs, i)
+      else
+        item.title, item.state, item.isDraft = title, status, is_draft
+      end
+      break
+    end
+  end
+end
+
 open_pr = function(number)
   if review and review.busy then return end
   if not ttt.open_changes then fail("Rebuild ttt with the draft open_changes API"); return end
   state.open_generation = state.open_generation + 1
   local generation, repo = state.open_generation, state.repo
+  local previous = state.current and state.current.number == number and state.current or nil
   state.current, state.error, state.opening = nil, "", number
   local function open_failed(message)
-    state.opening = nil
+    state.current, state.opening = previous, nil
     fail(message)
   end
   gh({"api", "repos/" .. repo .. "/pulls/" .. number}, nil, function(text, err)
@@ -363,13 +378,20 @@ open_pr = function(number)
       })
       if not id then open_failed(view_err); return end
       state.opening = nil
-      state.current = {repo = repo, number = number, title = pr.title, sha = pr.head.sha, tab = id,
+      local status = pr.merged and "MERGED" or string.upper(pr.state or "unknown")
+      update_list_item(number, pr.title, status, pr.draft)
+      state.current = {repo = repo, number = number, title = pr.title, sha = pr.head.sha, tab = id, status = status,
         comments = (tonumber(pr.comments) or 0) + (tonumber(pr.review_comments) or 0)}
       local id = "ci:" .. repo .. "#" .. number .. ":" .. pr.head.sha
       state.current.ci = state.ci_tabs[id] or {id = id, repo = repo, sha = pr.head.sha, jobs = {}, errors = {}}
       refresh_ci(state.current.ci)
     end)
   end)
+end
+
+local function refresh_pr()
+  if not state.current then ttt.notify("Open a pull request first"); return end
+  open_pr(state.current.number)
 end
 
 local function review_error(draft, message)
@@ -389,21 +411,22 @@ local function finish_review(draft, message)
   redraw()
 end
 
-local function merge_pr(draft)
+local function merge_pr(draft, method)
+  draft.busy, draft.error = true, ""
   local pr = draft.pr
+  local failure = draft.submitted and "Approved; merge failed: " or "Merge failed: "
   gh({"api", "--method", "PUT", "repos/" .. pr.repo .. "/pulls/" .. pr.number .. "/merge", "--input", "-"},
-      json.encode({sha = pr.sha, merge_method = "squash"}), function(text, err)
-    if err then review_error(draft, "Approved; merge failed: " .. err); return end
+      json.encode({sha = pr.sha, merge_method = method}), function(text, err)
+    if err then review_error(draft, failure .. err); return end
     local result, parse_err = decode(text)
-    if not result or not result.merged then
-      review_error(draft, "Approved; merge failed: " .. (parse_err or result.message or "GitHub refused the merge"))
+    if type(result) ~= "table" or result.merged ~= true then
+      local message = type(result) == "table" and result.message
+      review_error(draft, failure .. (message or parse_err or "GitHub refused the merge"))
       return
     end
-    for i, item in ipairs(state.prs) do
-      if item.number == pr.number then table.remove(state.prs, i); break end
-    end
+    update_list_item(pr.number, pr.title, "MERGED", false)
     state.current = nil
-    finish_review(draft, "Approved and merged PR #" .. pr.number)
+    finish_review(draft, (draft.submitted and "Approved and merged PR #" or "Merged PR #") .. pr.number)
   end)
 end
 
@@ -430,7 +453,7 @@ local function submit_review(draft, event)
       if submit_err then review_error(draft, submit_err); return end
       draft.submitted = true
       if merge then
-        merge_pr(draft)
+        merge_pr(draft, "squash")
       else
         finish_review(draft, (event == "APPROVE" and "Approved PR #" or "Commented on PR #") .. pr.number)
       end
@@ -628,6 +651,34 @@ local function open_comments()
   end)
 end
 
+local function open_merge()
+  if review and review.busy then return end
+  local pr = state.current
+  if not pr then ttt.notify("Open a pull request first"); return end
+  if pr.status ~= "OPEN" then ttt.notify("This pull request is already closed"); return end
+  local draft = {pr = pr, squash = true, error = ""}
+  local shown = ttt.open_dialog({
+    title = "Merge PR #" .. pr.number,
+    width = 64,
+    height = 7,
+    on_close = function() if review == draft and not draft.busy then review = nil end end,
+    render = function(p)
+      p:label({text = "Merge " .. pr.repo .. "#" .. pr.number .. "?", style = "bold"})
+      p:label({text = pr.title})
+      p:checkbox({label = "Squash merge", checked = draft.squash,
+        on_change = function(checked) if not draft.busy then draft.squash = checked end end})
+      p:label({text = draft.busy and "Merging…" or draft.error, style = draft.busy and "muted" or "danger"})
+      p:hstack({height = 2, gap = 1, padding_top = 1, align = "right", render = function(row)
+        row:button({label = "Cancel", padding_left = 2, padding_right = 2, disabled = draft.busy,
+          on_click = function() if not draft.busy then ttt.close_dialog() end end})
+        row:button({label = "Merge", padding_left = 2, padding_right = 2, disabled = draft.busy,
+          on_click = function() if not draft.busy then merge_pr(draft, draft.squash and "squash" or "merge") end end})
+      end})
+    end,
+  })
+  if shown then review = draft else ttt.notify("Close the current dialog first") end
+end
+
 local function open_review()
   if review and review.busy then return end
   if not state.current then ttt.notify("Open a pull request first"); return end
@@ -657,7 +708,7 @@ local function open_review()
         row:button({label = "Cancel", padding_left = 2, padding_right = 2, on_click = function() if not draft.busy then ttt.close_dialog() end end})
         if draft.submitted then
           row:button({label = "Retry merge", padding_left = 2, padding_right = 2, on_click = function()
-            if not draft.busy then draft.busy = true; draft.error = ""; merge_pr(draft) end
+            if not draft.busy then merge_pr(draft, "squash") end
           end})
         else
           row:button({label = "Comment", padding_left = 2, padding_right = 2, on_click = function() submit_review(draft, "COMMENT") end})
@@ -698,6 +749,8 @@ ttt.register({
           row:dropdown({label = "⋮", entries = {
             {label = "Comments", command = "comments"},
             {label = "Review", command = "review"},
+            {label = "Merge", command = "merge"},
+            {label = "Refresh", command = "refresh"},
             {label = "CI", command = "ci"},
             {label = "Timeline", command = "timeline"},
             {separator = true},
@@ -705,6 +758,8 @@ ttt.register({
           }, on_menu = function(command)
             if command == "comments" then open_comments()
             elseif command == "review" then open_review()
+            elseif command == "merge" then open_merge()
+            elseif command == "refresh" then refresh_pr()
             elseif command == "ci" then open_ci()
             elseif command == "timeline" then open_timeline()
             elseif command == "save-repository" then save_repository() end
@@ -718,7 +773,10 @@ ttt.register({
             row:label({text = count.text, style = count.style, width = ttt_text.width(count.text)})
           end
           row:label("")
-          row:button({label = "", padding_left = 1, padding_right = 1, on_click = open_review})
+          local width = p:size()
+          local padding = width >= 36 and 1 or 0
+          row:button({label = "", padding_left = padding, padding_right = padding, disabled = state.current.status ~= "OPEN", on_click = open_merge})
+          row:button({label = "", padding_left = padding, padding_right = padding, on_click = open_review})
         end})
         p:divider()
       end
@@ -776,6 +834,8 @@ ttt.register({
   commands = {
     {id = "pr-review.show", title = "PR Review: Show", handler = function() ttt.focus_panel("sidebar") end},
     {id = "pr-review.load", title = "PR Review: Load", handler = function() load_prs() end},
+    {id = "pr-review.merge", title = "PR Review: Merge", handler = open_merge},
+    {id = "pr-review.refresh", title = "PR Review: Refresh", handler = refresh_pr},
     {id = "pr-review.review", title = "PR Review: Review", handler = open_review},
     {id = "pr-review.ci", title = "PR Review: CI", handler = open_ci},
     {id = "pr-review.timeline", title = "PR Review: Timeline", handler = open_timeline},

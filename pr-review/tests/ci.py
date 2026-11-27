@@ -77,6 +77,8 @@ def run(binary, scenario, sidebar_width=65):
         assert result.returncode == 0, result.stderr.decode()
         text = screen.read_text()
         if scenario == "mixed":
+            toolbar = (artifact / (scenario + '-button.txt')).read_text()
+            assert "" in toolbar and "" in toolbar and toolbar.index("") < toolbar.index(""), toolbar
             for label in ["Build", "Passed", "Lint", "Failed", "Test", "Running", "Deploy", "Pending", "Docs", "Skipped", "Neutral", "Cancelled", "Timed out", "Action required"]:
                 assert label in text, (label, text)
         calls = [json.loads(line) for line in (root / "calls").read_text().splitlines()]
@@ -88,4 +90,4 @@ def run(binary, scenario, sidebar_width=65):
 
 if __name__ == "__main__":
     for scenario in ["mixed", "empty", "error", "invalid", "refresh", "poll"]:
-        run(str(Path(sys.argv[1]).resolve()), scenario)
+        run(str(Path(sys.argv[1]).resolve()), scenario, sidebar_width=30 if scenario == "mixed" else 65)
