@@ -1,27 +1,48 @@
 # CodeLLDB for ttt
 
-Install **CodeLLDB Debug Adapter** from the Plugins panel to register `lldb` in `debug.adapters`. The plugin supplies adapter settings. Install the debugger separately.
+Debug C, C++ and Rust programs with [CodeLLDB](https://github.com/vadimcn/codelldb). Install the debugger, then let the plugin configure ttt or add the settings yourself.
 
-## Requirements
+## Install the debugger
 
-Download the [CodeLLDB VSIX for your platform](https://github.com/vadimcn/codelldb/releases). Extract the archive, keep its directory layout, and add its `extension/adapter` directory to PATH. Run `codelldb --help` to verify.
+Download the VSIX for your platform from the [releases page](https://github.com/vadimcn/codelldb/releases): `codelldb-linux-x64.vsix`, `codelldb-linux-arm64.vsix`, `codelldb-darwin-arm64.vsix`, `codelldb-darwin-x64.vsix` or `codelldb-win32-x64.vsix`. A VSIX is a zip archive:
 
-## Launch a program
+```sh
+mkdir -p ~/.local/share/codelldb && cd ~/.local/share/codelldb
+curl -LO https://github.com/vadimcn/codelldb/releases/latest/download/codelldb-linux-x64.vsix
+unzip -o codelldb-linux-x64.vsix
+```
 
-Compile your C program with debug symbols, for example `cc -g -O0 main.c -o example`. For C++, use `c++ -g -O0 main.cpp -o example`. At a breakpoint inside a method, expand `this` in Variables to inspect its members. Save this target in `.ttt/launch.json`, set a gutter breakpoint, and select **Run & Debug** in the Debug sidebar.
+Keep the extracted layout. Add `~/.local/share/codelldb/extension/adapter` to PATH, or use the absolute path to `extension/adapter/codelldb` as the first item of `command`. Verify with `codelldb --help`.
+
+## Configure ttt
+
+Install **CodeLLDB Debug Adapter** from the Plugins panel, or add this to `~/.config/ttt/settings.json`:
 
 ```json
 {
-  "configurations": [
-    {
-      "name": "Launch C example",
-      "type": "lldb",
-      "request": "launch",
-      "program": "${workspaceFolder}/example",
-      "cwd": "${workspaceFolder}"
+  "debug": {
+    "adapters": {
+      "lldb": {
+        "command": ["codelldb", "--port", "${port}"],
+        "transport": "server",
+        "languages": ["c", "cpp", "rust"],
+        "markers": ["Cargo.toml", "CMakeLists.txt", "Makefile"],
+        "configurations": [
+          {
+            "name": "Launch program",
+            "request": "launch",
+            "program": "${workspaceFolder}/example",
+            "cwd": "${workspaceFolder}"
+          }
+        ]
+      }
     }
-  ]
+  }
 }
 ```
 
-You can customize the adapter in user `settings.json`. Installation preserves existing entries. Uninstall removes only entries this plugin created that still match its installed settings.
+The plugin keeps an existing `debug.adapters.lldb` entry unchanged, and uninstalling it removes only an entry it created that you have not edited.
+
+## Launch a program
+
+Compile with debug symbols, for example `cc -g -O0 main.c -o example`, `c++ -g -O0 main.cpp -o example` or `cargo build`. **Configure** in the Debug sidebar writes a **Launch program** target to `.ttt/launch.json`. Change `program` to your binary, such as `${workspaceFolder}/target/debug/app` for Rust, set a gutter breakpoint, and select **Run & Debug**. At a breakpoint inside a method, expand `this` in Variables to inspect its members.

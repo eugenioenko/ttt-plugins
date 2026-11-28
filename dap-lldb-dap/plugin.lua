@@ -6,5 +6,9 @@ ttt.on_install(function()
     command = {"lldb-dap"},
     transport = "stdio",
     languages = {"c"},
+    markers = {"CMakeLists.txt", "Makefile"},
+    configurations = {
+      {name = "Launch program", request = "launch", program = "${workspaceFolder}/example", sourcePath = "${workspaceFolder}"},
+    },
   })
 end)

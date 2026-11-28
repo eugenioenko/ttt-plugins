@@ -7,11 +7,12 @@ local adapter = {
   transport = "stdio",
   fileLaunch = {program = "${file}"},
   languages = {"python"},
+  markers = {"pyproject.toml", "requirements.txt", "setup.py"},
+  configurations = {
+    {name = "Launch main.py", request = "launch", program = "${workspaceFolder}/main.py"},
+  },
 }
-local keys = {"debug.adapters.debugpy"}
 
 ttt.on_install(function()
-  for _, key in ipairs(keys) do
-    settings.set_default(key, adapter)
-  end
+  settings.set_default("debug.adapters.debugpy", adapter)
 end)

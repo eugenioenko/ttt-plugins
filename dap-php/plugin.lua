@@ -6,6 +6,10 @@ ttt.on_install(function()
     command = {"php-debug-adapter"},
     transport = "stdio",
     languages = {"php"},
+    markers = {"composer.json"},
+    configurations = {
+      {name = "Listen for Xdebug", request = "launch", hostname = "127.0.0.1", port = 9003},
+    },
     fileLaunch = {
       program = "${file}",
       cwd = "${workspaceFolder}",

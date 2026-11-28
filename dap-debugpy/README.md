@@ -1,28 +1,46 @@
 # Python Debugger for ttt
 
-Install **Python Debugger** from the Plugins panel to register `debugpy` in `debug.adapters`. The plugin supplies adapter settings. Install the debugger separately.
+Debug Python programs with [debugpy](https://github.com/microsoft/debugpy). Install the debugger, then let the plugin configure ttt or add the settings yourself.
 
-## Requirements
+## Install the debugger
 
-Install [debugpy](https://github.com/microsoft/debugpy) in the interpreter used for debugging with `python -m pip install debugpy`. Verify with `python -m debugpy --version`. ttt uses the workspace’s `.venv` when available. Set `python` on a launch target to select another interpreter.
+Install debugpy into the Python environment your project uses. ttt uses the workspace's `.venv` when it exists:
 
-## Launch a program
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install debugpy
+```
 
-**Debug File** launches the active Python file using the configured interpreter.
+Skip the first line if the project already has a `.venv`. On Windows, use `.venv\Scripts\python`. Verify with `.venv/bin/python -m debugpy --version`. Set `python` on a launch target to use another interpreter.
 
-Use an existing Python entry point. Save this target in `.ttt/launch.json`, set a gutter breakpoint, and select **Run & Debug** in the Debug sidebar.
+## Configure ttt
+
+Install **Python Debugger** from the Plugins panel, or add this to `~/.config/ttt/settings.json`:
 
 ```json
 {
-  "configurations": [
-    {
-      "name": "Launch Python example",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${workspaceFolder}/main.py"
+  "debug": {
+    "adapters": {
+      "debugpy": {
+        "provider": "debugpy",
+        "command": ["${python}", "-m", "debugpy.adapter"],
+        "transport": "stdio",
+        "languages": ["python"],
+        "markers": ["pyproject.toml", "requirements.txt", "setup.py"],
+        "fileLaunch": {"program": "${file}"},
+        "configurations": [
+          {"name": "Launch main.py", "request": "launch", "program": "${workspaceFolder}/main.py"}
+        ]
+      }
     }
-  ]
+  }
 }
 ```
 
-You can customize the adapter in user `settings.json`. Installation preserves existing entries. Uninstall removes only entries this plugin created that still match its installed settings.
+The plugin keeps an existing `debug.adapters.debugpy` entry unchanged, and uninstalling it removes only an entry it created that you have not edited.
+
+## Launch a program
+
+**Debug File** launches the active Python file using the workspace interpreter.
+
+**Configure** in the Debug sidebar writes a **Launch main.py** target to `.ttt/launch.json`. Change `program` to your entry point, set a gutter breakpoint, and select **Run & Debug**.

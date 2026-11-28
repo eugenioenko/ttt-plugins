@@ -5,11 +5,12 @@ local adapter = {
   command = {"codelldb", "--port", "${port}"},
   transport = "server",
   languages = {"c", "cpp", "rust"},
+  markers = {"Cargo.toml", "CMakeLists.txt", "Makefile"},
+  configurations = {
+    {name = "Launch program", request = "launch", program = "${workspaceFolder}/example", cwd = "${workspaceFolder}"},
+  },
 }
-local keys = {"debug.adapters.lldb"}
 
 ttt.on_install(function()
-  for _, key in ipairs(keys) do
-    settings.set_default(key, adapter)
-  end
+  settings.set_default("debug.adapters.lldb", adapter)
 end)

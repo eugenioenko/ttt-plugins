@@ -11,11 +11,13 @@ local adapter = {
     {pattern = "*_test.go", arguments = {mode = "test"}},
   },
   languages = {"go"},
+  markers = {"go.mod"},
+  configurations = {
+    {name = "Launch package", request = "launch", program = "${workspaceFolder}"},
+    {name = "Debug tests", request = "launch", mode = "test", program = "${workspaceFolder}"},
+  },
 }
-local keys = {"debug.adapters.go"}
 
 ttt.on_install(function()
-  for _, key in ipairs(keys) do
-    settings.set_default(key, adapter)
-  end
+  settings.set_default("debug.adapters.go", adapter)
 end)

@@ -5,11 +5,13 @@ local adapter = {
   command = {"gdb", "-q", "-nx", "-i", "dap"},
   transport = "stdio",
   languages = {"c", "cpp"},
+  markers = {"CMakeLists.txt", "Makefile", "meson.build"},
+  configurations = {
+    {name = "Launch program", request = "launch", program = "${workspaceFolder}/example", cwd = "${workspaceFolder}"},
+    {name = "Attach to process", request = "attach", pid = "${command:pickProcess}"},
+  },
 }
-local keys = {"debug.adapters.gdb"}
 
 ttt.on_install(function()
-  for _, key in ipairs(keys) do
-    settings.set_default(key, adapter)
-  end
+  settings.set_default("debug.adapters.gdb", adapter)
 end)
