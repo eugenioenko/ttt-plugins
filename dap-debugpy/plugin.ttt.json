@@ -1,0 +1,15 @@
+{
+  "name": "dap-debugpy",
+  "displayName": "Python Debugger",
+  "description": "Configure Python Debugger for Python debugging",
+  "version": "0.1.0",
+  "author": "eugenioenko",
+  "entry": "plugin.lua",
+  "api": 1,
+  "permissions": {
+    "settings": true,
+    "settings_keys": [
+      "debug.adapters.debugpy"
+    ]
+  }
+}
